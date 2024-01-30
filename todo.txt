@@ -1,0 +1,5 @@
+1. Validate Oauth if ngrok should be in google oauth client2
+2. Set up whatsapp message, find where webhook from response is, take the response and use it to input credentials and wa_id in database from_client_config
+3. Check database file every time app is initiated to avoid initiating oauth
+4. Play with doc api to figure out how to manipulate
+5. set up agent to manipulate doc api with message content
