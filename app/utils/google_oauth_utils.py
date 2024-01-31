@@ -1,12 +1,28 @@
-import os
-from dotenv import load_dotenv
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
+from flask import request, session
+import json
+import os
+from dotenv import load_dotenv
 
-
+# Load environment variables
 load_dotenv()
 CLIENT_ID = os.getenv("OAUTH_CLIENT_ID")
 CLIENT_SECRET = os.getenv("OAUTH_CLIENT_SECRET")
+NGROK_DOMAIN = os.getenv("NGROK_DOMAIN") #TODO: Change to your domain in prod
+
+
+# Set up the Google OAuth 2.0 client & scopes
+CLIENT_CONFIG = {
+    "web": {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "redirect_uris": [f"https://{NGROK_DOMAIN}/callback"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token"
+    }
+}
+SCOPES = ['https://www.googleapis.com/auth/documents']
 
 
 

@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 from cryptography.fernet import Fernet
-from .__init__ import db
+from .database import db
+
 
 class User(db.Model):
     __tablename__ = 'users'

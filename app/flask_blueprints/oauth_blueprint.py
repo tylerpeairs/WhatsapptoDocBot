@@ -1,13 +1,13 @@
 #import the required libraries
 from flask import Blueprint, session, redirect, url_for, render_template
-from .auth import get_credentials_from_session, get_authorization_url, CLIENT_CONFIG, SCOPES #Can I import config and scopes directly from oauth_utils?
+from app.utils.google_oauth_utils import get_credentials_from_session, get_authorization_url, fetch_token_and_store_in_session, CLIENT_CONFIG, SCOPES
 
 oauth_blueprint = Blueprint('oauth', __name__)
 
 @oauth_blueprint.route('/')
 def index():
     if 'credentials' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('oauth.login'))
     
     credentials = get_credentials_from_session(session)
     
@@ -16,7 +16,7 @@ def index():
         # Display a success message
         return render_template('index.html', message="You have successfully authenticated Whatsapp to Doc Bot!")
     else:
-        return redirect(url_for('login'))
+        return redirect(url_for('oauth.login'))
     # Use 'credentials' to make authorized API requests
     # ...
 
@@ -29,7 +29,10 @@ def login():
 def callback():
     session_data = fetch_token_and_store_in_session(CLIENT_CONFIG, SCOPES)
     session.update(session_data)
+
+    # Set 'authenticated' to True after successful OAuth flow
+    session['authenticated'] = True
     
     #TODO: Store refresh token in a secure location matching the wa_id
 
-    return redirect(url_for('index'))
+    return redirect(url_for('oauth.index'))

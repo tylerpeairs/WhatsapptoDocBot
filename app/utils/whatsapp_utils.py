@@ -1,6 +1,6 @@
 import logging
 from flask import current_app, jsonify
-from ../models import db, User
+from ..models import db, User
 import json
 import requests
 
