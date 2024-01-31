@@ -1,5 +1,6 @@
 import logging
 from flask import current_app, jsonify
+from ../models import db, User
 import json
 import requests
 
@@ -82,6 +83,16 @@ def process_whatsapp_message(body):
     name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
     message = body["entry"][0]["changes"][0]["value"]["messages"][0]
     message_body = message["text"]["body"]
+
+    user = User.query.filter_by(wa_id=wa_id).first()
+    
+    if not user:
+        # If user does not exist, create a new one
+        user = User(wa_id=wa_id)
+        db.session.add(user)
+        db.session.commit()
+        logging.info(f"New user created with wa_id: {wa_id}")
+
 
     # TODO: implement custom function here
     response = generate_response(message_body)

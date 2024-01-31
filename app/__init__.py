@@ -7,7 +7,6 @@ import os
 from app.config import load_configurations, configure_logging
 from .views import webhook_blueprint
 
-#Create db
 db = SQLAlchemy()
 
 # Load environment variables
@@ -18,7 +17,7 @@ CLIENT_ID = os.getenv("OAUTH_CLIENT_ID")
 CLIENT_SECRET = os.getenv("OAUTH_CLIENT_SECRET")
 
 # The OAuth scopes you need
-SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
+SCOPES = ['https://www.googleapis.com/auth/documents']
 
 #Ngrok Domain
 NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
