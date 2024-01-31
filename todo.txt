@@ -15,3 +15,16 @@ get recipient whatsapp id from webhook instead of storing it as env variable, at
 add unit tests with copolit
 
 session is user specific, so is useful for storing auth_token
+
+
+    user = User.query.filter_by(wa_id=wa_id).first()
+    
+    if not user:
+        # If user does not exist, create a new one
+        user = User(wa_id=wa_id)
+        db.session.add(user)
+        db.session.commit()
+        logging.info(f"New user created with wa_id: {wa_id}")
+
+
+#Figured out what's wrong with Oauth state - create a development environment on nonNGROK webserver

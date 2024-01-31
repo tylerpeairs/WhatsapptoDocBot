@@ -1,9 +1,15 @@
-from google_auth_oauthlib.flow import Flow
-from google.oauth2.credentials import Credentials
+# Description: This file contains the utility functions for Google OAuth 2.0
+
+# Import the required modules
 from flask import request, session
 import json
 import os
+import secrets
 from dotenv import load_dotenv
+
+# Import the required Google OAuth 2.0 modules
+from google_auth_oauthlib.flow import Flow
+from google.oauth2.credentials import Credentials
 
 # Load environment variables
 load_dotenv()
@@ -28,15 +34,26 @@ SCOPES = ['https://www.googleapis.com/auth/documents']
 
 # The redirect URI for the OAuth consent screen
 def get_authorization_url(client_config, scopes):
+
+    # Create a unique state value
+    state = secrets.token_urlsafe()
+
+    # Store the state in the session for later verification
+    session['oauth_state'] = state
+
+
+    # Create a new Flow instance
     flow = Flow.from_client_config(
         client_config=client_config,
         scopes=scopes,
         redirect_uri=client_config['web']['redirect_uris'][0]
     )
 
-    authorization_url, state = flow.authorization_url(
+    # Generate the authorization URL
+    authorization_url, _ = flow.authorization_url(
         access_type='offline',
         prompt='consent',
+        state=state
     )
 
     return authorization_url, state
@@ -48,12 +65,15 @@ def get_credentials_from_session(session):
     return credentials
 
 def fetch_token_and_store_in_session(client_config, scopes):
+    # Create a new Flow instance
     flow = Flow.from_client_config(
         client_config=client_config,
         scopes=scopes,
         redirect_uri=client_config['web']['redirect_uris'][0]
     )
 
+
+    # Fetch the token
     flow.fetch_token(authorization_response=request.url)
 
     # Store the credentials in the session

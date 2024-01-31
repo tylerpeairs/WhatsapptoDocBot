@@ -1,19 +1,26 @@
+# Description: Utility functions for WhatsApp integration
+
+# Import the required libraries
 import logging
 from flask import current_app, jsonify
-from ..models import db, User
 import json
 import requests
-
-from app.services.openai_service import generate_response
 import re
 
+# Import the database
+from ..models import db, User
 
+# Import the OpenAI service
+#from app.services.openai_service import generate_response
+
+
+# Log the HTTP response
 def log_http_response(response):
     logging.info(f"Status: {response.status_code}")
     logging.info(f"Content-type: {response.headers.get('content-type')}")
     logging.info(f"Body: {response.text}")
 
-
+# Get the input for a text message
 def get_text_message_input(recipient, text):
     return json.dumps(
         {
@@ -26,19 +33,24 @@ def get_text_message_input(recipient, text):
     )
 
 
+# Send a custom text WhatsApp message which responds to the user's message in uppercase
+#TODO: delete for OpenAI generation
 def generate_response(response):
     # Return text in uppercase
     return response.upper()
 
-
+# Send a custom text WhatsApp message
 def send_message(data):
+    # Set the headers
     headers = {
         "Content-type": "application/json",
         "Authorization": f"Bearer {current_app.config['ACCESS_TOKEN']}",
     }
 
+    # Set the POST URL
     url = f"https://graph.facebook.com/{current_app.config['VERSION']}/{current_app.config['PHONE_NUMBER_ID']}/messages"
 
+    # Try to send the message
     try:
         response = requests.post(
             url, data=data, headers=headers, timeout=10
@@ -57,7 +69,7 @@ def send_message(data):
         log_http_response(response)
         return response
 
-
+# Process the incoming WhatsApp message
 def process_text_for_whatsapp(text):
     # Remove brackets
     pattern = r"\【.*?\】"
@@ -75,24 +87,19 @@ def process_text_for_whatsapp(text):
 
     return whatsapp_style_text
 
-
+# Process the incoming WhatsApp message
 def process_whatsapp_message(body):
     logging.info(f"Received WhatsApp message body: {body}")
 
+    # Extract the user's WhatsApp ID and name
     wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
     name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
+    # Extract the message & message type
     message = body["entry"][0]["changes"][0]["value"]["messages"][0]
     message_body = message["text"]["body"]
 
-    user = User.query.filter_by(wa_id=wa_id).first()
-    
-    if not user:
-        # If user does not exist, create a new one
-        user = User(wa_id=wa_id)
-        db.session.add(user)
-        db.session.commit()
-        logging.info(f"New user created with wa_id: {wa_id}")
-
+    #TODO:Determine the most appropriate place for this. Could store the wa_id into the session
+    #TODO:Check if the user exists in the database
 
     # TODO: implement custom function here
     response = generate_response(message_body)
@@ -101,14 +108,12 @@ def process_whatsapp_message(body):
     #response = generate_response(message_body, wa_id, name)
     #response = process_text_for_whatsapp(response)
 
+    # Prepare Whatsapp JSON and send the message
     data = get_text_message_input(current_app.config["RECIPIENT_WAID"], response)
     send_message(data)
 
-
+# Check if the incoming payload is a valid WhatsApp message
 def is_valid_whatsapp_message(body):
-    """
-    Check if the incoming webhook event has a valid WhatsApp message structure.
-    """
     return (
         body.get("object")
         and body.get("entry")

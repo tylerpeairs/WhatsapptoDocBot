@@ -11,22 +11,24 @@ from .database import db
 from flask import Flask, redirect, request, session, url_for, json, render_template
 
 
-
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #TODO bypass https requirement (REMOVE FOR PROD)
 
 # Create the app
 def create_app():
+
+    
     # Create a Flask app
     app = Flask(__name__)
-    app.secret_key = os.urandom(24)
+    app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Set a consistent secret key
     
-    # Set up the database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'  #TODO:Change to your own database URI
-    db.init_app(app)
+
 
     # Load configurations and logging settings
     load_configurations(app)
     configure_logging()
+
+    # Set up the database
+    db.init_app(app)
 
     # Register blueprints
     register_blueprints(app)

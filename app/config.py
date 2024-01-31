@@ -1,9 +1,12 @@
+# Description: This file is used to load the configurations from the .env file and set the logging level for the application.
+
+# Import the required modules
 import sys
 import os
 from dotenv import load_dotenv
 import logging
 
-
+# Load the configurations
 def load_configurations(app):
     load_dotenv()
     app.config["ACCESS_TOKEN"] = os.getenv("ACCESS_TOKEN")
@@ -14,8 +17,10 @@ def load_configurations(app):
     app.config["VERSION"] = os.getenv("VERSION")
     app.config["PHONE_NUMBER_ID"] = os.getenv("PHONE_NUMBER_ID")
     app.config["VERIFY_TOKEN"] = os.getenv("VERIFY_TOKEN")
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'  #TODO:Change to your own database URI
+    app.config['SESSION_COOKIE_SECURE'] = True
 
-
+# Set up the logging
 def configure_logging():
     logging.basicConfig(
         level=logging.INFO,

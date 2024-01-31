@@ -1,14 +1,15 @@
+# This file contains decorators to ensure that the incoming requests to our webhook are valid and signed with the correct signature.
+
+# Import the required modules
 from functools import wraps
 from flask import current_app, jsonify, request
 import logging
 import hashlib
 import hmac
 
-
+# Validate the incoming payload's signature against our expected signature
 def validate_signature(payload, signature):
-    """
-    Validate the incoming payload's signature against our expected signature
-    """
+
     # Use the App Secret to hash the payload
     expected_signature = hmac.new(
         bytes(current_app.config["APP_SECRET"], "latin-1"),
@@ -19,11 +20,8 @@ def validate_signature(payload, signature):
     # Check if the signature matches
     return hmac.compare_digest(expected_signature, signature)
 
-
+# Decorator to ensure that the incoming requests to our webhook are valid and signed with the correct signature.
 def signature_required(f):
-    """
-    Decorator to ensure that the incoming requests to our webhook are valid and signed with the correct signature.
-    """
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
