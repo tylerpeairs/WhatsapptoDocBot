@@ -1,10 +1,11 @@
 import logging
 import json
-
+from dotenv import load_dotenv
+import os
 from flask import Blueprint, request, jsonify, current_app
 
-from .decorators.security import signature_required
-from .utils.whatsapp_utils import (
+from ..decorators.security import signature_required
+from ..utils.whatsapp_utils import (
     process_whatsapp_message,
     is_valid_whatsapp_message,
 )
@@ -54,7 +55,7 @@ def handle_message():
         return jsonify({"status": "error", "message": "Invalid JSON provided"}), 400
 
 
-# Required webhook verifictaion for WhatsApp
+# Required webhook verificaion for WhatsApp
 def verify():
     # Parse params from the webhook verification request
     mode = request.args.get("hub.mode")
