@@ -14,7 +14,7 @@ client = OpenAI(api_key=OPEN_AI_API_KEY)
 # --------------------------------------------------------------
 # Create assistant
 # --------------------------------------------------------------
-def create_assistant(file):
+def create_assistant():
     """
     You currently cannot set the temperature for Assistant via the API.
     """
@@ -22,13 +22,12 @@ def create_assistant(file):
         name="WhatsApp Google Doc Assistant",
         instructions="You're a helpful WhatsApp assistant that can assist guests that are staying in our Paris AirBnb. Use your knowledge base to best respond to customer queries. If you don't know the answer, say simply that you cannot help with question and advice to contact the host directly. Be friendly and funny.",
         tools=[{"type": "retrieval"}],
-        model="gpt-4-1106-preview",
-        file_ids=[file.id],
+        model="gpt-4-1106-preview"
     )
     return assistant
 
 
-#assistant = create_assistant(file)
+assistant = create_assistant()
 
 
 # --------------------------------------------------------------
@@ -106,10 +105,10 @@ def run_assistant(thread):
 # Test assistant
 # --------------------------------------------------------------
 
-new_message = generate_response("What's the check in time?", "123", "John")
+#new_message = generate_response("What's the check in time?", "123", "John")
 
-new_message = generate_response("What's the pin for the lockbox?", "456", "Sarah")
+#new_message = generate_response("What's the pin for the lockbox?", "456", "Sarah")
 
-new_message = generate_response("What was my previous question?", "123", "John")
+#new_message = generate_response("What was my previous question?", "123", "John")
 
-new_message = generate_response("What was my previous question?", "456", "Sarah")
+#new_message = generate_response("What was my previous question?", "456", "Sarah")

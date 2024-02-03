@@ -1,11 +1,8 @@
-Before code gets more complicated and you get overwhelmed do a complete step through starting with run then init then down your other files to completey understand the codebase. Use copilot to explain the code for you. Search how to best use it to explainc oide.
-Read flask,ngrok, whatsapp cloud API documentation  
-Reading google Oauth https://developers.google.com/identity/protocols/oauth2
 
-2. Set up whatsapp message, find where webhook from response is, take the response and use it to input credentials and wa_id in database from_client_config. See grimoire history for next db steps.
-3. Check database file every time app is initiated instead of session data or what needs to be session data v database data?
-4. Play with doc api to figure out how to manipulate
+4. Play with doc api to figure out how to manipulate.
 5. set up agent to manipulate doc api with message content
+6. Look into application security
+7. refresh the auth token and check if it's expired based on functions below
 
 
 everytime a new request is made after expiration (time function), then obtain a new access token by querying the database for the refresh token. Likely diffcheck 60 minutes between webhooks
@@ -14,17 +11,20 @@ keep auth token in session, but also store it in db
 get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
 add unit tests with copolit
 
-session is user specific, so is useful for storing auth_token
-
-
-    user = User.query.filter_by(wa_id=wa_id).first()
-    
-    if not user:
-        # If user does not exist, create a new one
-        user = User(wa_id=wa_id)
-        db.session.add(user)
-        db.session.commit()
-        logging.info(f"New user created with wa_id: {wa_id}")
-
 
 #Figured out what's wrong with Oauth state - create a development environment on nonNGROK webserver
+
+
+Login success message & store user in database
+"""
+
+
+def is_token_expired(credentials):
+    # Assuming you know the lifespan of your tokens, e.g., 1 hour
+    token_lifespan = timedelta(hours=1)
+    now = datetime.utcnow()
+    # Calculate the age of the token
+    token_age = now - credentials['updated_at']
+    return token_age > token_lifespan
+
+    """

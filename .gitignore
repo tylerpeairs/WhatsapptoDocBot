@@ -96,5 +96,3 @@ todo.txt
 # Ignore quickstart examples
 whatsapp_quickstart.py
 
-# Ignore threads
-threads*.db

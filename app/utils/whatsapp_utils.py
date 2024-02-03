@@ -9,8 +9,8 @@ import re
 
 # Import the database
 from ..models import User
-from ..database import clear_database, get_user_credentials, clear_database
-#from google_oauth_utils import refresh_auth_token
+from ..database import get_user_credentials
+from .google_oauth_utils import is_token_expired, refresh_access_token
 
 # Import the OpenAI service
 #from app.services.openai_service import generate_response
@@ -109,18 +109,18 @@ def process_whatsapp_message(body):
         refresh_token = credentials['refresh_token']
         created_at = credentials['created_at']
         updated_at = credentials['updated_at']
-        response = f"You are already verified. I created a google doc for you..."
+        if is_token_expired(credentials):  # Implement token expiration check as needed
+            new_access_token = refresh_auth_token(refresh_token).token
+            # Update the access token in the database
+            # You'll need to implement a function to update the Credential record
+            update_access_token(wa_id, new_access_token)    
 
-
-        #TODO: Refresh Access Token
-    
+        response = f"Eligible for AI Processing"
 
     name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
     # Extract the message & message type
     message = body["entry"][0]["changes"][0]["value"]["messages"][0]
     message_body = message["text"]["body"]
-
-    #TODO:Determine the most appropriate place for this. Could store the wa_id into the session
 
     # OpenAI Integration
     #response = generate_response(message_body, wa_id, name)

@@ -1,6 +1,7 @@
 # This file is used to create the database object that will be used to interact with the database
 
 # Import the required modules
+from sqlalchemy import true
 from sqlalchemy.exc import SQLAlchemyError
 
 # Import models
@@ -62,15 +63,30 @@ def store_user_credentials(wa_id, access_token, refresh_token):
         print(f"Failed to store user credentials: {e}")  # Consider using logging instead of print for production applications
         
 
-def clear_database():
+# Update the access token in the database
+def update_access_token(wa_id, access_token):
+    """
+    Store a new user's access token after refresh in the database with error handling.
+
+    Parameters:
+    - wa_id: The WhatsApp ID of the user.
+    - access_token: The OAuth access token for the user.
+    """
     try:
-        # This disables foreign key checks, allowing all rows to be deleted
-        db.session.execute('SET FOREIGN_KEY_CHECKS=0;')
-        for table in reversed(db.metadata.sorted_tables):
-            db.session.execute(table.delete())
+        # Start a transaction
+        with db.session.begin():
+            # Create a new User record
+            user_to_update = session.query(User).filter(User.wa_id).one()
+
+            #Update the auth token
+            user_to_update.credentials.access_token = access_token
+        # Commit the transaction
         db.session.commit()
-        # Re-enable foreign key checks
-        db.session.execute('SET FOREIGN_KEY_CHECKS=1;')
-    except Exception as e:
-        print(f"Failed to clear database: {e}")
+
+        # Return the user object for further processing or confirmation if needed
+    except SQLAlchemyError as e:
+        # Roll back the session to undo any partial changes due to the exception
         db.session.rollback()
+        
+        # Log the exception or handle it as needed for your application's requirements
+        print(f"Failed to store user credentials: {e}")  #
