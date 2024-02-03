@@ -1,17 +1,22 @@
+# This file contains the webhook blueprint for the Flask app. It handles the incoming webhook events from the WhatsApp API.
+
+# Import the required modules
 import logging
 import json
 from dotenv import load_dotenv
 import os
 from flask import Blueprint, request, jsonify, current_app
 
+# Import security decorators
 from app.decorators.security import signature_required
 
-
+# Import whatsapp utils
 from ..utils.whatsapp_utils import (
     process_whatsapp_message,
     is_valid_whatsapp_message,
 )
 
+# Load the environment variables
 webhook_blueprint = Blueprint("webhook", __name__)
 
 
@@ -79,11 +84,12 @@ def verify():
         logging.info("MISSING_PARAMETER")
         return jsonify({"status": "error", "message": "Missing parameters"}), 400
 
-
+# Define the routes for getting the webhook
 @webhook_blueprint.route("/webhook", methods=["GET"])
 def webhook_get():
     return verify()
 
+# Define the routes for posting the webhook
 @webhook_blueprint.route("/webhook", methods=["POST"])
 @signature_required
 def webhook_post():

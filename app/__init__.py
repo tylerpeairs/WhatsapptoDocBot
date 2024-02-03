@@ -1,3 +1,5 @@
+# Description: This file is the main entry point for the application. It creates the Flask app and registers the blueprints.
+
 #Import OS and Dotenv
 import os
 
@@ -5,7 +7,7 @@ import os
 from .config import load_configurations, configure_logging
 
 #Import the database
-from .database import db
+from .extensions import db
 
 #Import Flask and the database
 from flask import Flask, redirect, request, session, url_for, json, render_template
@@ -20,9 +22,9 @@ def create_app():
     # Create a Flask app
     app = Flask(__name__)
     app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Set a consistent secret key
+    app.config['SECRET_KEY'] = 'a_secret_key'
+
     
-
-
     # Load configurations and logging settings
     load_configurations(app)
     configure_logging()
@@ -30,13 +32,16 @@ def create_app():
     # Set up the database
     db.init_app(app)
 
+    # Import models here to ensure they are known to SQLAlchemy
+    from . import models
+
     # Register blueprints
     register_blueprints(app)
 
 
     return app
 
-
+# Import blueprints to register
 def register_blueprints(app):
     # Import blueprints
     from .flask_blueprints.webhook_blueprint import webhook_blueprint

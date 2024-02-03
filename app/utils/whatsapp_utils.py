@@ -2,13 +2,15 @@
 
 # Import the required libraries
 import logging
-from flask import current_app, jsonify
+from flask import current_app, jsonify, session
 import json
 import requests
 import re
 
 # Import the database
-from ..models import db, User
+from ..models import User
+from ..database import clear_database, get_user_credentials, clear_database
+#from google_oauth_utils import refresh_auth_token
 
 # Import the OpenAI service
 #from app.services.openai_service import generate_response
@@ -93,16 +95,32 @@ def process_whatsapp_message(body):
 
     # Extract the user's WhatsApp ID and name
     wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
+
+    # Check if User Exists and Get Their Credentials
+    credentials = get_user_credentials(wa_id)
+    # If user does not exist, prompt the user to login
+    if not credentials['exists']:
+        login_url = f"https://deciding-werewolf-infinitely.ngrok-free.app/login?number={wa_id}"
+        response = f"For me to create and update Google Docs, I will need you to authorize me to access your Google Docs. Please do this at {login_url}" #TODO: Update URL and make it clickable
+    # If
+    else:
+        # Extract tokens
+        access_token = credentials['access_token']
+        refresh_token = credentials['refresh_token']
+        created_at = credentials['created_at']
+        updated_at = credentials['updated_at']
+        response = f"You are already verified. I created a google doc for you..."
+
+
+        #TODO: Refresh Access Token
+    
+
     name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
     # Extract the message & message type
     message = body["entry"][0]["changes"][0]["value"]["messages"][0]
     message_body = message["text"]["body"]
 
     #TODO:Determine the most appropriate place for this. Could store the wa_id into the session
-    #TODO:Check if the user exists in the database
-
-    # TODO: implement custom function here
-    response = generate_response(message_body)
 
     # OpenAI Integration
     #response = generate_response(message_body, wa_id, name)

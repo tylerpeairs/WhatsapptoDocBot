@@ -1,3 +1,5 @@
+# Description: This file contains the OpenAI service that is used to interact with the OpenAI API.
+
 from openai import OpenAI
 import shelve
 from dotenv import load_dotenv

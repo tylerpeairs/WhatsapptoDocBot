@@ -1,11 +1,12 @@
 # Description: This file contains the models for the database.
 
 # Import the required modules
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import validates, relationship
-from cryptography.fernet import Fernet
-from .database import db
+from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from .extensions import db
+
 
 # Create the User class
 class User(db.Model):
@@ -28,3 +29,7 @@ class Credential(db.Model):
     user_id = Column(Integer, ForeignKey('users.id'))
     access_token = Column(String)
     refresh_token = Column(String)
+
+    # Access Tokens Expire in 1 hour, so we need to store the time when the token was created to check for expiration and refresh requirements
+    created_at = Column(DateTime, default=func.now())  # Automatically set at creation
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())  # Automatically update
