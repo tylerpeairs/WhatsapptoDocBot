@@ -1,27 +1,110 @@
+from multiprocessing import context
 from openai import OpenAI
 import shelve
 from dotenv import load_dotenv
 import os
 import time
+from datetime import datetime
+from app.database import get_user_credentials
+
 
 load_dotenv()
 OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
 client = OpenAI(api_key=OPEN_AI_API_KEY)
 
+action_schema = {
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Google Docs API Services",
+    "description": "Interact with the Google Docs API to create and manage documents.",
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://docs.googleapis.com/v1"
+    }
+  ],
+  "paths": {
+    "/documents": {
+      "post": {
+        "description": "Create a new Google Doc with a specified title",
+        "operationId": "CreateDocument",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Title of the document to be created"
+                  }
+                },
+                "required": ["title"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "documentId": {
+                      "type": "string",
+                      "description": "The ID of the created document"
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The title of the created document"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
 
 
 
 # --------------------------------------------------------------
 # Create assistant
 # --------------------------------------------------------------
-def create_assistant():
+def create_assistant(access_token):
+
     """
     You currently cannot set the temperature for Assistant via the API.
     """
     assistant = client.beta.assistants.create(
         name="WhatsApp Google Doc Assistant",
         instructions="You're a helpful WhatsApp assistant that can assist guests that are staying in our Paris AirBnb. Use your knowledge base to best respond to customer queries. If you don't know the answer, say simply that you cannot help with question and advice to contact the host directly. Be friendly and funny.",
-        tools=[{"type": "retrieval"}],
+        tools=[
+            {
+                "type": "function",
+                "function": action_schema
+            }
         model="gpt-4-1106-preview"
     )
     return assistant
@@ -46,7 +129,9 @@ def store_thread(wa_id, thread_id):
 # --------------------------------------------------------------
 # Generate response
 # --------------------------------------------------------------
-def generate_response(message_body, wa_id, name):
+def generate_response(message_body, wa_id, name, document_title, access_token):
+ 
+
     # Check if there is already a thread_id for the wa_id
     thread_id = check_if_thread_exists(wa_id)
 
@@ -62,11 +147,23 @@ def generate_response(message_body, wa_id, name):
         print(f"Retrieving existing thread for {name} with wa_id {wa_id}")
         thread = client.beta.threads.retrieve(thread_id)
 
+    structured_message_content = {
+        "body": message_body,  # Original message body
+        "context": {
+            "documentTitle": document_title,
+            "accessToken": access_token  # Be cautious with passing sensitive information
+        }
+    }
+    
+    # Convert structured_message_content to a string if necessary
+    # Ensure your system handles this securely
+    content_to_send = json.dumps(structured_message_content)
+
     # Add message to thread
     message = client.beta.threads.messages.create(
         thread_id=thread_id,
         role="user",
-        content=message_body,
+        content=content_to_send, 
     )
 
     # Run the assistant and get the new message

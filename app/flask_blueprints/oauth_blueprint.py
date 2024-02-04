@@ -1,10 +1,13 @@
 # This file contains the blueprint for the OAuth flow
 
 # Import the required libraries
+from turtle import st
 from flask import Blueprint, session, redirect, url_for, render_template, request
+from httpx import get
 from app.utils.google_oauth_utils import get_credentials_from_session, get_authorization_url, fetch_token_and_store_in_session, CLIENT_CONFIG, SCOPES
 from app.utils.whatsapp_utils import send_message, get_text_message_input
-from app.database import store_user_credentials
+from app.database import store_document_details, store_user_credentials, get_most_recent_document
+from app.utils.google_doc_utils import create_google_docs_document
 
 # Create the blueprint
 oauth_blueprint = Blueprint('oauth', __name__)
@@ -18,7 +21,7 @@ def index():
         return redirect(url_for('oauth.login'))
     
 
-    # Get the credentials from the session. It's a dict with the refresh and access tokens.
+    # Get the credentials from the session
     credentials = get_credentials_from_session(session)
     
     # Check if the user has been authenticated
@@ -27,10 +30,27 @@ def index():
         wa_id = session.get('wa_id')
         print(f"wa_id at index: {session.get('wa_id')}")
         if wa_id:
+
+            # Check if the user has a document
+            if get_most_recent_document(wa_id) is None:
+                
+                # Create a new Google Doc
+                document_details = create_google_docs_document(credentials)
+                # Extract document_id and document_title from the returned dictionary
+                document_id = document_details['document_id']
+                document_title = document_details['document_title']
+                # Store the document details in the database
+                store_document_details(wa_id, document_title, document_id)
+            else:
+                # Get the most recent document
+                document = get_most_recent_document(wa_id)
+                print(f"Most recent document: {document}")
+                document_title = document['title']
+                document_id = document['document_id']
             # Prepare the success message
-            success_message = "Now I can access your Google Docs. Send any message to create a doc and organize your message."
+            success_message = f"Your most recent document is {document_title}. You can access it here: https://docs.google.com/document/d/{document_id}/edit. Message me to add more information."
             success_message_data = get_text_message_input(wa_id, success_message)
-            send_message(success_message_data)  # Ensure this function is adapted to handle the data structure
+            send_message(success_message_data)
             return render_template('index.html', message="You have successfully authenticated Whatsapp to Doc Bot!")
         else:
             print(f"WA_ID not being passed")  # Debug print

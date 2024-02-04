@@ -5,7 +5,7 @@ from sqlalchemy import true
 from sqlalchemy.exc import SQLAlchemyError
 
 # Import models
-from .models import User, Credential
+from .models import User, Credential, Document
 from .extensions import db
 
 
@@ -90,3 +90,32 @@ def update_access_token(wa_id, access_token):
         
         # Log the exception or handle it as needed for your application's requirements
         print(f"Failed to store user credentials: {e}")  #
+
+# Store document details after using Google Docs API create call. user_id will be wa_id
+def store_document_details(user_id, title, document_id):
+    # Create a new Document instance with the provided details
+    new_document = Document(user_id=user_id, title=title, document_id=document_id)
+    
+    # Add the new document to the session and commit it to the database
+    db.session.add(new_document)
+    db.session.commit()
+    
+    print(f"Document {title} with ID {document_id} stored in database.")
+
+# Get the document details from the database using the wa_id
+def get_most_recent_document(user_id):
+    # Query the Document table for the most recent document related to the user_id
+    document = Document.query.filter_by(user_id=user_id).order_by(Document.created_at.desc()).first()
+
+    # If a document is found, prepare the details
+    if document:
+        document_details = {
+            'title': document.title,
+            'document_id': document.document_id,
+            'created_at': document.created_at  # Optionally include the creation timestamp
+        }
+        return document_details
+    else:
+        # Return None or an appropriate message if no document is found
+        return None
+ 

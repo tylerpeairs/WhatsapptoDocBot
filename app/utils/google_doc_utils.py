@@ -1,21 +1,29 @@
-from google_auth_oauthlib.flow import Credentials
 from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
 from datetime import datetime
-import pickle
-import os.path
+
+def create_google_docs_document(credentials):
+    # Get today's date in the desired format (e.g., YYYY-MM-DD)
+    today_date = datetime.now().strftime('%Y-%m-%d')
+
+    # Combine "Whatsapp Notes" with today's date
+    document_title = f"Whatsapp Notes {today_date}"
+    
+    # Build the Google Docs service
+    service = build('docs', 'v1', credentials=credentials)
+    
+    # The body of the request containing the document title
+    document = {
+        'title': document_title
+    }
+    
+    # Use the Google Docs service to create a new document
+    doc = service.documents().create(body=document).execute()
+    
+    # Print the created document ID
+    print(f"Created document with ID: {doc['documentId']}")
+    
+    # Return the document ID and title in a dictionary
+    return {'document_id': doc['documentId'], 'document_title': document_title}
 
 
-
-def create_document(title, access_token):
-    """Shows basic usage of the Docs API. Creates a document with the given title."""
-
-    service = build('docs', 'v1', credentials=access_token)
-
-    # Create a new document
-    document = service.documents().create(body={'title': title}).execute()
-    print('Created document with title: {0} (ID: {1})'.format(document.get('title'), document.get('documentId')))
-
-if __name__ == '__main__':
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    document_title = f"Document {current_date}"
-    create_document(document_title)

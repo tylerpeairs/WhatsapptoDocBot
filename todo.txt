@@ -1,30 +1,23 @@
+Input assistant prompt - just test it and refine later w/ threads
+Store document title/id in the database to reference and do a check for creation
+Put get function in the schema with the document id which is passed to the chatbot
+Put batch update in the schema with the document id and passed the get response to the chatbot and specific instructions
 
 4. Play with doc api to figure out how to manipulate.
 5. set up agent to manipulate doc api with message content
 6. Look into application security
-7. refresh the auth token and check if it's expired based on functions below
-
-
-everytime a new request is made after expiration (time function), then obtain a new access token by querying the database for the refresh token. Likely diffcheck 60 minutes between webhooks
-keep auth token in session, but also store it in db
+7. Unit tests
+8. Try/Catch
+9. Production
+10. Other TODO's
 
 get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
-add unit tests with copolit
 
 
-#Figured out what's wrong with Oauth state - create a development environment on nonNGROK webserver
 
-
-Login success message & store user in database
-"""
-
-
-def is_token_expired(credentials):
-    # Assuming you know the lifespan of your tokens, e.g., 1 hour
-    token_lifespan = timedelta(hours=1)
-    now = datetime.utcnow()
-    # Calculate the age of the token
-    token_age = now - credentials['updated_at']
-    return token_age > token_lifespan
-
-    """
+1. Start with create document assistant single thread
+2. Initiate a create document with a whatsapp message
+3. Store document id & title in the database to reference and do a creation check during process message
+4. 2nd message after auth should be a document link
+5. initiate a get doc function in assistant by passing in document id then console log it
+6. initiate a batch update function in assistant by passing in doc id and whatsapp message, telling it in the prompt to update headers, move to many shot

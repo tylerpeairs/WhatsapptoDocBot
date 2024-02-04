@@ -33,3 +33,18 @@ class Credential(db.Model):
     # Access Tokens Expire in 1 hour, so we need to store the time when the token was created to check for expiration and refresh requirements
     created_at = Column(DateTime, default=func.now())  # Automatically set at creation
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())  # Automatically update
+
+
+class Document(db.Model):
+    __tablename__ = 'documents'
+    
+    # Columns
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    title = Column(String)
+    document_id = Column(String)
+    created_at = Column(DateTime, default=func.now())  # Timestamp of creation
+
+    
+    # Relationship to User
+    user = relationship("User", backref="documents")
