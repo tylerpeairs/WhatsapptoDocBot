@@ -8,7 +8,7 @@ import requests
 import re
 
 # Import the database
-from ..models import User, Document, Credential
+from ..models import User, Document
 from ..database import get_user_credentials, store_document_details
 from .google_doc_utils import create_google_docs_document
 from google.oauth2.credentials import Credentials

@@ -5,7 +5,7 @@ from sqlalchemy import true
 from sqlalchemy.exc import SQLAlchemyError
 
 # Import models
-from .models import User, Credential, Document
+from .models import User, Document
 from .extensions import db
 
 # Import JSON
