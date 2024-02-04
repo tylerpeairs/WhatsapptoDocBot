@@ -1,6 +1,7 @@
 # Description: Utility functions for WhatsApp integration
 
 # Import the required libraries
+from functools import update_wrapper
 import logging
 from flask import current_app, jsonify, session
 import json
@@ -10,7 +11,7 @@ import re
 # Import the database
 from ..models import User, Document
 from ..database import get_user_credentials, store_document_details, get_most_recent_document
-from .google_doc_utils import create_google_docs_document, get_google_doc
+from .google_doc_utils import create_google_docs_document, get_google_doc, batch_update_google_docs_document, create_append_text_update_request
 from google.oauth2.credentials import Credentials
 
 # Update Whatsapp Utils for any credentials related references
@@ -101,6 +102,10 @@ def process_whatsapp_message(body):
     # Extract the user's WhatsApp ID and name
     wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
 
+    # Extract the user's message text
+    text_body = body['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
+
+
     # Check if User Exists and Get Their Credentials
     credentials = get_user_credentials(wa_id)
     logging.info(f"credentials: {credentials}")
@@ -128,7 +133,9 @@ def process_whatsapp_message(body):
             document = get_most_recent_document(wa_id)
             document_id = document['document_id']
             document_content = get_google_doc(credentials, document_id)
-            response = f"Document Content Loaded"
+            update_request = create_append_text_update_request(document_content, text_body)
+            batch_update_google_docs_document(credentials, document_id, update_request)
+            response = f"Updated document with your text: https://docs.google.com/document/d/{document_id}/edit."
 
   
 

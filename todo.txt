@@ -1,6 +1,5 @@
-Input assistant prompt - just test it and refine later w/ threads
-Store document title/id in the database to reference and do a check for creation
-Put get function in the schema with the document id which is passed to the chatbot
+
+
 Put batch update in the schema with the document id and passed the get response to the chatbot and specific instructions
 4. Play with doc api to figure out how to manipulate.
 5. set up agent to manipulate doc api with message content
@@ -9,6 +8,7 @@ Put batch update in the schema with the document id and passed the get response 
 8. Try/Catch
 9. Production
 10. Other TODO's
+11. Can you track token usage by user instead of making new OpenAI API key for each user?
 
 get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
 
