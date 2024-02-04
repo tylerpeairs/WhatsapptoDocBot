@@ -58,8 +58,15 @@ def batch_update_google_docs_document(credentials, document_id, update_requests)
     
     # Print the result or return it for further processing
     print(f"Batch update completed. Result: {result}")
-    return result
+    return results
 
+
+"""
+1. Create an assistant which we can pass document_content, credentials, whatsapp message, and the document_id
+2. Have this assistant take the document_content and whatsapp message to create an text_update_request
+3. Have this assistant call the batch_update_google_docs_document function with the text_update_request
+4. Send a whatsapp message confirming the batch update
+"""
 
 """
 def create_append_text_update_request(document, append_text):

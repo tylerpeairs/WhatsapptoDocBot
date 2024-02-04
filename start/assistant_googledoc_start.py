@@ -1,117 +1,87 @@
-from multiprocessing import context
 from openai import OpenAI
 import shelve
 from dotenv import load_dotenv
 import os
 import time
-from datetime import datetime
-from app.database import get_user_credentials
-
+import json
 
 load_dotenv()
 OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
 client = OpenAI(api_key=OPEN_AI_API_KEY)
 
-action_schema = {
-  "openapi": "3.1.0",
-  "info": {
-    "title": "Google Docs API Services",
-    "description": "Interact with the Google Docs API to create and manage documents.",
-    "version": "v1.0.0"
-  },
-  "servers": [
-    {
-      "url": "https://docs.googleapis.com/v1"
-    }
-  ],
-  "paths": {
-    "/documents": {
-      "post": {
-        "description": "Create a new Google Doc with a specified title",
-        "operationId": "CreateDocument",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "title": {
-                    "type": "string",
-                    "description": "Title of the document to be created"
-                  }
-                },
-                "required": ["title"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Document created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "documentId": {
-                      "type": "string",
-                      "description": "The ID of the created document"
-                    },
-                    "title": {
-                      "type": "string",
-                      "description": "The title of the created document"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    }
-  },
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    }
-  }
-}
+assistant_instructions = """You're a helpful WhatsApp assistant that assists businesses in organizing their WhatsApp messages by inputing them into a Google Document and categorizing them. Use the provided Google Docs API function batch_update_google_docs_document and update the document according to the user's whatsapp message.
 
+You will receive 3 variables:
+
+1. whatsapp_text is the text content from the user's most recent whatsapp message. This is the text which will be added to the document.
+2. document_content is the JSON object returned from Google's get document API which will need to be manipulated to insert the whatsapp_text in an organized and categorized format. You must extract the document_id from this and use it as part of your batch_update request.
+3. user credentials is the credentials needed to post the batch update request
+
+Here are the values for these 3 variables:
+credentials: {credentials}
+whatsapp_text: {whatsapp_text}
+document_content: {document_content}
+
+If you don't know how to categorize the message, ask the user to choose a category and provide 3 suggestions. Categorizations always correspond to a HEADING_1 namedStyleType. For example, let's say you received the following request:
+
+Your response should always be in the format of:  
+
+Google Docs Link: https://docs.google.com/document/d/{document_id}/edit
+Categorized: {Categorization}  
+Text Added: {Human Readable Format}  
+
+Here's an example of a request and response:
+
+credentials: user_credential_object
+whatsapp_text: "got 300 pesos Tyler"
+document_content: document_content_object
+
+You will change the text to be more readable, so you might change it to "Received 300 pesos from Tyler", and you could categorize it under "Money Received". Then you make a corresponding batch update request where you input the new text under the Money Received categorization by using the batch_update_google_docs_document function. If there is existing text in the document_content, you must use that text as context, so you may not always need to create new categories but instead can add text under an existing category by referencing the index of the category and surrounding text. Additionally, you will not always categorize or add text at the beginning or the end of the document. Rather, read the document_content object and decide the most logical place to insert the new text and categories.
+
+Your response may look like:
+Google Docs Link: https://docs.google.com/document/d/example_document_id/edit
+Categorized: "Money Received"
+Text Added: "Received 300 pesos from Tyler" """
+
+def getTools(array):
+  # call this function to get your template json to attache to a new Assistant.
+  # the array contains the function NAMES only
+  # tool = getTools(["getContact", "webscrape"])
+
+    tools = []
+    l = globals()
+    for a in array:
+        f = None
+        try:
+            f = l[a]
+        except:
+            pass
+        if f!=None:
+            tools.append( {"type": "function","function" : f()})
+    return tools
+
+tools = getTools(["batch_update_google_docs_document"])
 
 
 # --------------------------------------------------------------
 # Create assistant
 # --------------------------------------------------------------
-def create_assistant(access_token):
+def create_assistant(assistant_instructions, tools):
 
     """
     You currently cannot set the temperature for Assistant via the API.
     """
     assistant = client.beta.assistants.create(
         name="WhatsApp Google Doc Assistant",
-        instructions="You're a helpful WhatsApp assistant that can assist guests that are staying in our Paris AirBnb. Use your knowledge base to best respond to customer queries. If you don't know the answer, say simply that you cannot help with question and advice to contact the host directly. Be friendly and funny.",
-        tools=[
-            {
-                "type": "function",
-                "function": action_schema
-            }
+        instructions=assistant_instructions,
+        tools=tools,
         model="gpt-4-1106-preview"
     )
     return assistant
 
 
-assistant = create_assistant()
-
+assistant = create_assistant(assistant_instructions, tools)
+print(assistant)
 
 # --------------------------------------------------------------
 # Thread management
@@ -209,3 +179,61 @@ def run_assistant(thread):
 #new_message = generate_response("What was my previous question?", "123", "John")
 
 #new_message = generate_response("What was my previous question?", "456", "Sarah")
+
+
+
+"""You're a helpful WhatsApp assistant that assists businesses in organizing their WhatsApp messages by inputing them into a Google Document and categorizing them. Use the provided Google Docs API function batch_update_google_docs_document and update the document according to the user's whatsapp message.
+
+You will receive 3 variables:: 
+
+2. whatsapp_text is the text content from the user's most recent whatsapp message. This is the text which will be added to the document.
+3. document_content is the JSON object returned from Google's get document API which will need to be manipulated to insert the whatsapp_text in an organized and categorized format. You must extract the document_id from this and use it as part of your batch_update request.
+4. user credentials is the credentials needed to post the batch update request
+
+Here are the values for these 4 variables:
+credentials: {credentials}
+whatsapp_text: {whatsapp_text}
+document_content: {document_content}
+
+If you don't know how to categorize the message, ask the user to choose a category and provide 3 suggestions. Categorizations always correspond to a HEADING_1 namedStyleType. For example, let's say you received the following request:
+
+Your response should always be in the format of:  
+
+Google Docs Link: https://docs.google.com/document/d/{document_id}/edit
+Categorized: {Categorization}  
+Text Added: {Human Readable Format}  
+
+Here's an example of a request and response:
+
+credentials: user_credential_object
+whatsapp_text: "got 300 pesos Tyler"
+document_content: document_content_object
+
+You will change the text to be more readable, so you might change it to "Received 300 pesos from Tyler", and you could categorize it under "Money Received". Then you make a corresponding batch update request where you input the new text under the Money Received categorization by using the batch_update_google_docs_document function. If there is existing text in the document_content, you must use that text as context, so you may not always need to create new categories but instead can add text under an existing category. Additionally, you will not always categorize or add text at the beginning or the end of the document. Rather, read the document_content object and decide the most logical place to insert the new text and categories.
+
+Your response may look like:
+Google Docs Link: https://docs.google.com/document/d/example_document_id/edit
+Categorized: "Money Received"
+Text Added: "Received 300 pesos from Tyler"
+"""
+
+
+# Create tools array to input into the assistants API from our utils functions
+    
+
+
+"""
+def callTools(tool_calls):
+# the parameter comes straight from the openAI run 
+    tool_outputs = []
+    for t in tool_calls:
+        functionName = t.function.name
+        attributes = json.loads(t.function.arguments)
+        try:
+            functionResponse =globals()[functionName](attributes)
+        except:
+             # we just tell openAi we couldn't :)
+            functionResponse = { "status" : 'Error in function call '+functionName+'('+t.function.arguments+')' }
+        tool_outputs.append(  { "tool_call_id": t.id , "output": json.dumps(functionResponse) })
+    return tool_outputs
+"""
