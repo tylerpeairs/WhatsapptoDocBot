@@ -4,13 +4,15 @@
 from turtle import st
 from flask import Blueprint, session, redirect, url_for, render_template, request
 from httpx import get
-from app.utils.google_oauth_utils import get_credentials_from_session, get_authorization_url, fetch_token_and_store_in_session, CLIENT_CONFIG, SCOPES
+from app.utils.google_oauth_utils import get_credentials_from_session, get_authorization_url, CLIENT_CONFIG, SCOPES
 from app.utils.whatsapp_utils import send_message, get_text_message_input
 from app.database import store_document_details, store_user_credentials, get_most_recent_document
 from app.utils.google_doc_utils import create_google_docs_document
 
 # Create the blueprint
 oauth_blueprint = Blueprint('oauth', __name__)
+
+
 
 # Define the index route
 @oauth_blueprint.route('/')
@@ -81,40 +83,22 @@ def login():
 @oauth_blueprint.route('/callback')
 def callback():
 
-    # Fetch the state from the session
-    session_state = session.get('oauth_state')
-    print(f"State from session: {session_state}")  # Debug print
-
-
-    # Fetch the state returned in the callback URL
-    callback_state = request.args.get('state')
-    print(f"State from callback: {callback_state}")  # Debug print
-
-
-
     # Verify if the states match
-    """if not session_state or session_state != callback_state:
+    if not session_state or session_state != callback_state:
         # Handle the error - states do not match
         return 'State validation failed', 403
-"""
-    # Fetch the token and store it in the session
-    session_data = fetch_token_and_store_in_session(CLIENT_CONFIG, SCOPES)
-    session.update(session_data)
 
     # Retrieve wa_id from session or parameter
     wa_id = session.get('wa_id')    
-    print(f"wa_id during callback: {session.get('wa_id')}")
 
     # Set 'authenticated' to True after successful OAuth flow
     session['authenticated'] = True
-    
-    # Get tokens from the session data
-    access_token = session_data.get('access_token')
-    refresh_token = session_data.get('refresh_token')
 
-    # Store refresh token in a secure location matching the wa_id
-    store_user_credentials(wa_id, access_token, refresh_token)
+    # Get the credentials from the session after Oauth updates them
+    credentials = get_credentials_from_session(session)
 
+    # Store credentials in a secure location matching the wa_id
+    store_user_credentials(wa_id, credentials)
 
     # Redirect to the index route to display the success message
     return redirect(url_for('oauth.index'))

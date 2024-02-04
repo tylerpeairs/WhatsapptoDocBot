@@ -8,6 +8,9 @@ from sqlalchemy.orm import relationship
 from .extensions import db
 
 
+Base = declarative_base()
+
+
 # Create the User class
 class User(db.Model):
     # Define the user table name
@@ -15,24 +18,11 @@ class User(db.Model):
     # Define the user table columns
     id = Column(Integer, primary_key=True)
     wa_id = Column(String, unique=True)  # WhatsApp ID
+    serialized_credentials = Column(Text)  # Store serialized Google credentials as a JSON string
 
-    # Relationship to Credential
-    credentials = relationship("Credential", backref="user", uselist=False)
+    # Relationship to Document
+    documents = relationship("Document", backref="user")
 
-# Create the Credential class
-class Credential(db.Model):
-    # Define the credential table name
-    __tablename__ = 'credentials'
-
-    # Define the credential table columns
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    access_token = Column(String)
-    refresh_token = Column(String)
-
-    # Access Tokens Expire in 1 hour, so we need to store the time when the token was created to check for expiration and refresh requirements
-    created_at = Column(DateTime, default=func.now())  # Automatically set at creation
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())  # Automatically update
 
 
 class Document(db.Model):
@@ -48,3 +38,6 @@ class Document(db.Model):
     
     # Relationship to User
     user = relationship("User", backref="documents")
+
+
+

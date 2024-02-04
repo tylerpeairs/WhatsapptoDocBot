@@ -2,7 +2,6 @@ Input assistant prompt - just test it and refine later w/ threads
 Store document title/id in the database to reference and do a check for creation
 Put get function in the schema with the document id which is passed to the chatbot
 Put batch update in the schema with the document id and passed the get response to the chatbot and specific instructions
-
 4. Play with doc api to figure out how to manipulate.
 5. set up agent to manipulate doc api with message content
 6. Look into application security
@@ -12,7 +11,6 @@ Put batch update in the schema with the document id and passed the get response 
 10. Other TODO's
 
 get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
-
 
 
 1. Start with create document assistant single thread

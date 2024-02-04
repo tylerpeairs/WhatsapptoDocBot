@@ -10,8 +10,12 @@ import re
 # Import the database
 from ..models import User, Document, Credential
 from ..database import get_user_credentials, store_document_details
-from .google_oauth_utils import is_token_expired, refresh_access_token
-from .google_doc_utils import create_google_doc
+from .google_doc_utils import create_google_docs_document
+from google.oauth2.credentials import Credentials
+
+# Update Whatsapp Utils for any credentials related references
+# Update Prompt to pass in credentials object instead
+
 
 # Import the OpenAI service
 #from app.services.openai_service import generate_response
@@ -99,27 +103,15 @@ def process_whatsapp_message(body):
 
     # Check if User Exists and Get Their Credentials
     credentials = get_user_credentials(wa_id)
-    # If user does not exist, prompt the user to login
+
+    # If user credentials do not exist, prompt the user to login
     if not credentials['exists']:
         login_url = f"https://deciding-werewolf-infinitely.ngrok-free.app/login?number={wa_id}"
         response = f"For me to create and update Google Docs, I will need you to authorize me to access your Google Docs. Please do this at {login_url}" #TODO: Update URL and make it clickable
     # If
     else:
-        # Extract tokens
-        access_token = credentials['access_token']
-        refresh_token = credentials['refresh_token']
-        created_at = credentials['created_at']
-        updated_at = credentials['updated_at']
-        if is_token_expired(credentials):  # Implement token expiration check as needed
-            new_access_token = refresh_auth_token(refresh_token).token
-            # Update the access token in the database
-            # You'll need to implement a function to update the Credential record
-            update_access_token(wa_id, new_access_token)
-
-        # Run a docs check
-
-         
-
+        # Check if the user has a document, will need to get a credentials object from access_token and refresh_token
+        # Run a docs check, does the most recent database doc object match a file in their drive, if not create a new one
         response = f"Eligible for AI Processing"
 
   
