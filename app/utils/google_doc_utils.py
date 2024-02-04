@@ -27,3 +27,20 @@ def create_google_docs_document(credentials):
     return {'document_id': doc['documentId'], 'document_title': document_title}
 
 
+def get_google_doc(credentials, document_id):
+    # Build the Google Docs service
+    service = build('docs', 'v1', credentials=credentials)
+    
+    try:
+        # Use the Google Docs service to get the specified document by ID
+        document = service.documents().get(documentId=document_id).execute()
+        
+        # Print some information about the document
+        print(f"Document retrieved successfully: {document['title']} (ID: {document['documentId']})")
+        
+        # Return the document object
+        return document
+    except Exception as e:
+        # If an error occurs, print it and return None
+        print(f"Error retrieving document: {e}")
+        return None

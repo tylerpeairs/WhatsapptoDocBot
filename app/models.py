@@ -20,9 +20,6 @@ class User(db.Model):
     wa_id = Column(String, unique=True)  # WhatsApp ID
     serialized_credentials = Column(Text)  # Store serialized Google credentials as a JSON string
 
-    # Relationship to Document
-    documents = relationship("Document", backref="user")
-
 
 
 class Document(db.Model):

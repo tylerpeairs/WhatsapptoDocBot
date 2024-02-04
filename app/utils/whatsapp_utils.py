@@ -9,8 +9,8 @@ import re
 
 # Import the database
 from ..models import User, Document
-from ..database import get_user_credentials, store_document_details
-from .google_doc_utils import create_google_docs_document
+from ..database import get_user_credentials, store_document_details, get_most_recent_document
+from .google_doc_utils import create_google_docs_document, get_google_doc
 from google.oauth2.credentials import Credentials
 
 # Update Whatsapp Utils for any credentials related references
@@ -103,16 +103,32 @@ def process_whatsapp_message(body):
 
     # Check if User Exists and Get Their Credentials
     credentials = get_user_credentials(wa_id)
+    logging.info(f"credentials: {credentials}")
+
 
     # If user credentials do not exist, prompt the user to login
-    if not credentials['exists']:
+    if not credentials:
         login_url = f"https://deciding-werewolf-infinitely.ngrok-free.app/login?number={wa_id}"
         response = f"For me to create and update Google Docs, I will need you to authorize me to access your Google Docs. Please do this at {login_url}" #TODO: Update URL and make it clickable
     # If
     else:
-        # Check if the user has a document, will need to get a credentials object from access_token and refresh_token
-        # Run a docs check, does the most recent database doc object match a file in their drive, if not create a new one
-        response = f"Eligible for AI Processing"
+        # Check if the user has a document
+        if get_most_recent_document(wa_id) is None:
+            logging.info(f"User {wa_id} does not have a document")
+            # Create a new document
+            document_details = create_google_docs_document(credentials)
+            document_title = document_details['title']
+            document_id = document_details['document_id']
+            # Store the document details in the database
+            store_document_details(wa_id, document_title, document_id)
+            document_content = get_google_doc(credentials, document_id)
+        else:
+            logging.info(f"User {wa_id} has a document")
+            # Get the most recent document
+            document = get_most_recent_document(wa_id)
+            document_id = document['document_id']
+            document_content = get_google_doc(credentials, document_id)
+            response = f"Document Content Loaded"
 
   
 

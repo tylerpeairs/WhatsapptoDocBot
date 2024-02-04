@@ -32,10 +32,8 @@ def index():
         wa_id = session.get('wa_id')
         print(f"wa_id at index: {session.get('wa_id')}")
         if wa_id:
-
             # Check if the user has a document
             if get_most_recent_document(wa_id) is None:
-                
                 # Create a new Google Doc
                 document_details = create_google_docs_document(credentials)
                 # Extract document_id and document_title from the returned dictionary
@@ -70,7 +68,11 @@ def login():
     authorization_url, state = get_authorization_url(CLIENT_CONFIG, SCOPES)
     # Retrieve the wa_id from 'number' query parameter
     wa_id = request.args.get('number', None)
+
+    # Store the wa_id and state in the session
     session['wa_id'] = wa_id
+    session['oauth_state'] = state  # Store the state in the session
+
     # Explicitly save the session if necessary
     session.modified = True
     print(f"Session after setting state: {session}")  # Debug print
@@ -84,6 +86,8 @@ def login():
 def callback():
 
     # Verify if the states match
+    session_state = session.get('oauth_state')
+    callback_state = request.args.get('state')
     if not session_state or session_state != callback_state:
         # Handle the error - states do not match
         return 'State validation failed', 403

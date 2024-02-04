@@ -3,6 +3,7 @@
 # Import the required modules
 from sqlalchemy import true
 from sqlalchemy.exc import SQLAlchemyError
+import logging
 
 # Import models
 from .models import User, Document
@@ -18,43 +19,38 @@ from google.oauth2.credentials import Credentials
 # Get user credentials
 def get_user_credentials(wa_id):
     # Query the user by wa_id along with their credentials
+    logging.debug(f"Querying for user with wa_id: {wa_id}")
     user = User.query.filter_by(wa_id=wa_id).first()
-    if user and user.credentials:
+    if user:
+        logging.debug(f"User found with wa_id: {wa_id}")
         # User exists and has associated credentials
-        unserialized_credentials = json.loads(user.credentials)
+        unserialized_credentials = json.loads(user.serialized_credentials)
         return Credentials.from_authorized_user_info(unserialized_credentials)
     else:
-        # User does not exist or has no credentials
-        return {'exists': False}
+        # User does not exist
+        logging.debug(f"No user found with wa_id: {wa_id}")
+        return None
 
-
-# Store a new user's WhatsApp ID and OAuth credentials in the database with error handling.
+# Store user credentials
 def store_user_credentials(wa_id, credentials):
-    try:
-        # Start a transaction
-        with db.session.begin():
-            # Create a new User record
-            user = User(wa_id=wa_id)
-            db.session.add(user)
-            
-            # Flush the session to assign an ID to the user without committing the transaction. This gives the credential table.
-            db.session.flush()
 
-            # Create and link new Credential record to this user
-            serialized_credentials = credentials.to_json()
-            db.session.add(serialized_credentials)
+    # Query the user by wa_id
+    logging.debug(f"Querying for user with wa_id: {wa_id}")
+    user = User.query.filter_by(wa_id=wa_id).first()
 
-        # Commit the transaction
-        db.session.commit()
+    if user:
+        # User exists, update their credentials
+        logging.debug(f"User found with wa_id: {wa_id}, updating credentials")
+        user.serialized_credentials = credentials.to_json()
+    else:
+        # User does not exist, create a new user
+        logging.debug(f"No user found with wa_id: {wa_id}, creating new user")
+        user = User(wa_id=wa_id, serialized_credentials=credentials.to_json())
+        db.session.add(user)
 
-        # Return the user object for further processing or confirmation if needed
-        return user
-    except SQLAlchemyError as e:
-        # Roll back the session to undo any partial changes due to the exception
-        db.session.rollback()
-        
-        # Log the exception or handle it as needed for your application's requirements
-        print(f"Failed to store user credentials: {e}")  # Consider using logging instead of print for production applications
+    # Commit the changes to the database
+    db.session.commit()
+    logging.debug(f"Stored credentials for user with wa_id: {wa_id}")
         
 
 
