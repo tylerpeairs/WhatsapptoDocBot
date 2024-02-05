@@ -81,14 +81,28 @@ def get_most_recent_document(user_id):
     else:
         # Return None or an appropriate message if no document is found
         return None
- 
+    
+
+# Store thread_id for a wa_id
 def store_thread(wa_id, thread_id):
     user = User.query.filter_by(wa_id=wa_id).first()
     user.thread_id = thread_id
     db.session.commit()
     print(f"Stored thread_id for user with wa_id: {wa_id}")
 
+# Get thread_id for a wa_id
 def get_thread(wa_id):
     user = User.query.filter_by(wa_id=wa_id).first()
     return user.thread_id
     print(f"Retrieved thread_id: {thread_id} for user with wa_id: {wa_id}")
+
+
+# --------------------------------------------------------------
+# Thread management
+# --------------------------------------------------------------
+def check_if_thread_exists(wa_id):
+    thread_id = get_thread(wa_id)
+    if thread_id is None:
+        return None
+    else:
+        return thread_id

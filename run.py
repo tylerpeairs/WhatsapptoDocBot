@@ -14,8 +14,8 @@ if __name__ == "__main__":
     # TODO: Turn debug off
     # Run the Flask app on host 0.0.0.0 and port 8000
     
-    #with app.app_context():
-     #   db.drop_all()
-      #  db.create_all()
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
     
     app.run(host="0.0.0.0", port=8000, debug=True)

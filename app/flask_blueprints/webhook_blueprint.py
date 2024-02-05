@@ -14,6 +14,7 @@ from app.decorators.security import signature_required
 from ..utils.whatsapp_utils import (
     process_whatsapp_message,
     is_valid_whatsapp_message,
+    clear_processed_messages
 )
 
 # Load the environment variables
@@ -34,6 +35,7 @@ def handle_message():
     Returns:
         response: A tuple containing a JSON response and an HTTP status code.
     """
+    clear_processed_messages()
     body = request.get_json()
     # logging.info(f"request body: {body}")
 

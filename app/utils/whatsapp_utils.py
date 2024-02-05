@@ -15,6 +15,8 @@ from .google_doc_utils import create_google_docs_document, get_google_doc, batch
 from google.oauth2.credentials import Credentials
 from .openai_assistant_utils import generate_response
 
+processed_messages = set()  # This will keep track of processed message IDs
+
 # Update Whatsapp Utils for any credentials related references
 # Update Prompt to pass in credentials object instead
 
@@ -121,6 +123,7 @@ def process_whatsapp_message(body):
             document = get_most_recent_document(wa_id)
             document_id = document['document_id']
             document_content = get_google_doc(credentials, document_id)
+            logging.info(f"Document Content: {document_content}")
             response = generate_response(body, wa_id, document_content, credentials)
             #update_request = create_append_text_update_request(document_content, text_body)
             #batch_update_google_docs_document(credentials, document_id, update_request)
@@ -142,6 +145,23 @@ def process_whatsapp_message(body):
 
 # Check if the incoming payload is a valid WhatsApp message
 def is_valid_whatsapp_message(body):
+
+    # Extract message ID
+    message_id = body.get("entry", [{}])[0].get("changes", [{}])[0].get("value", {}).get("messages", [{}])[0].get("id")
+    
+    # Check for the necessary structure and if the message ID has not been processed
+    if (
+        body.get("object")
+        and body.get("entry")
+        and body["entry"][0].get("changes")
+        and body["entry"][0]["changes"][0].get("value")
+        and body["entry"][0]["changes"][0]["value"].get("messages")
+        and body["entry"][0]["changes"][0]["value"]["messages"][0]
+        and message_id not in processed_messages  # Check if message ID is not in the processed messages set
+    ):
+        # Mark the message ID as processed
+        processed_messages.add(message_id)
+    
     return (
         body.get("object")
         and body.get("entry")
@@ -150,3 +170,6 @@ def is_valid_whatsapp_message(body):
         and body["entry"][0]["changes"][0]["value"].get("messages")
         and body["entry"][0]["changes"][0]["value"]["messages"][0]
     )
+
+def clear_processed_messages():
+    processed_messages.clear()

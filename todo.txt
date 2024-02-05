@@ -25,3 +25,6 @@ https://cookbook.openai.com/examples/assistants_api_overview_python
 You really only need the update request from the chatbot since document id is in document_content and credentials are available via wa_id
 
 #Create and test new assistant with updated instructions and functions
+
+
+salesforce & notion & airtable connections

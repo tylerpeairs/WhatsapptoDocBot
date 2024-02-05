@@ -1,10 +1,10 @@
 from openai import OpenAI
 from dotenv import load_dotenv
+import logging
 import os
 import time
 import json
-from google.oauth2.credentials import Credentials
-from app.database import store_thread, get_thread, get_most_recent_document, get_user_credentials
+from app.database import store_thread, get_most_recent_document, get_user_credentials, check_if_thread_exists
 from .google_doc_utils import batch_update_google_docs_document
 
 load_dotenv()
@@ -13,89 +13,9 @@ ASSISTANT_ID = os.getenv("OPENAI_ASSISTANT_ID")
 client = OpenAI(api_key=OPEN_AI_API_KEY)
 
 
-assistant_instructions = """You're a helpful WhatsApp assistant that assists businesses in organizing their WhatsApp messages by inputing them into a Google Document and categorizing them. Use the provided Google Docs API function batch_update_google_docs_document and update the document according to the user's whatsapp message.
 
-You will receive a document_content object and a whatsapp_text:
-
-1. whatsapp_text is the text content from the user's most recent whatsapp message. This is the text which will be added to the document.
-2. document_content is the JSON object returned from Google's get document API which will need to be manipulated to insert the whatsapp_text in an organized and categorized format.
-
-
-Here are the values for these 2 variables:
-whatsapp_text: {whatsapp_text}
-document_content: {document_content}
-
-If you don't know how to categorize the message, ask the user to choose a category and provide 3 suggestions. Categorizations always correspond to a HEADING_1 namedStyleType. Once you have a categorization, you can call the batch_update_google_docs_document function with these values. For example, let's say you received the following request:
-
-Your response should always be in the format of:  
-
-'Google Docs Link: https://docs.google.com/document/d/{document_id}/edit
-Categorized: {Categorization}  
-Text Added: {Human Readable Format}'
-
-Here's an example of a request and response:
-
-whatsapp_text: "got 300 pesos Tyler"
-document_content: document_content_object
-
-You will change the text to be more readable, so you might change it to "Received 300 pesos from Tyler", and you could categorize it under "Money Received". Then you make a corresponding batch update request where you input the new text under the Money Received categorization by using the batch_update_google_docs_document function. If there is existing text in the document_content, you must consider that text in your produced update_requests, so you may not always need to create new categories but instead can add text under an existing category by referencing the index of the category and surrounding text. Additionally, you will not always categorize or add text at the beginning or the end of the document. Rather, read the document_content object and decide the most logical place to insert the new text and categories, then create the update_requests object.
-
-
-Your response may look like:
-'Google Docs Link: https://docs.google.com/document/d/example_document_id/edit
-Categorized: "Money Received"
-Text Added: "Received 300 pesos from Tyler"' """
 
 # Generate a 10 edge and test cases
-
-
-
-# --------------------------------------------------------------
-# Create assistant
-# --------------------------------------------------------------
-def create_assistant(assistant_instructions):
-
-    assistant = client.beta.assistants.create(
-        name="WhatsApp Google Doc Assistant v0.3",
-        instructions=assistant_instructions,
-        tools = [{
-          "type": "function",
-          "function": {
-            "name": "batch_update_google_docs_document",
-            "description": "Batch update a Google Docs document with specified update requests",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "update_requests": {
-                        "type": "array",
-                        "description": "A list of update requests to apply to the document",
-                        "items": {
-                            "type": "object",
-                            "description": "An individual update request"
-                        }
-                    }
-                },
-                "required": ["update_requests"]
-            }
-        }
-    }],
-        model="gpt-3.5-turbo-0125"
-    )
-    return assistant
-
-
-#assistant = create_assistant(assistant_instructions)
-#print(assistant)
-
-# --------------------------------------------------------------
-# Thread management
-# --------------------------------------------------------------
-def check_if_thread_exists(wa_id):
-    thread_id = get_thread(wa_id)
-    if thread_id is None:
-        return None
-    else:
-        return thread_id
 
 # --------------------------------------------------------------
 # Generate response
@@ -107,6 +27,7 @@ def generate_response(message_body, wa_id, document_content, credentials):
     thread_id = check_if_thread_exists(wa_id)
     print(f"Thread ID: {thread_id}")
 
+
     # If a thread doesn't exist, create one and store it
     if thread_id is None:
         thread = client.beta.threads.create()
@@ -116,24 +37,34 @@ def generate_response(message_body, wa_id, document_content, credentials):
     # Otherwise, retrieve the existing thread
     else:
         thread = client.beta.threads.retrieve(thread_id)
-        delete_existing_runs(thread.id)
+        print(f"Thread Retrieved: {thread}")
 
-    # Prepare the structured message content
-    whatsapp_text = message_body
+    # Ensure all previous runs are deleted/cancelled before proceeding
+    delete_existing_runs(thread_id)
 
-    content_to_send = f"whatsapp_text: {whatsapp_text}, document_content: {document_content}, credentials: {credentials}"
+    # Check for any existing active runs and only proceed if none are found
+    if not check_for_active_runs(thread_id):
+        # Prepare the structured message content
+        whatsapp_text = message_body
+        content_to_send = {
+            "whatsapp_text": whatsapp_text,
+            "document_content": document_content
+        }
 
-    # Add message to thread
-    message = client.beta.threads.messages.create(
-        thread_id=thread_id,
-        role="user",
-        content=content_to_send, 
-    )
+        # Add message to thread
+        message = client.beta.threads.messages.create(
+            thread_id=thread_id,
+            role="user",
+            content=json.dumps(content_to_send) 
+        )
 
-    # Run the assistant and get the new message
-    new_message = run_assistant(thread, wa_id)
-    print(f"To wa_id:", new_message)
-    return new_message
+        # Run the assistant and get the new message
+        new_message = run_assistant(thread, wa_id)
+        print(f"To wa_id:", new_message)
+        return new_message
+    else:
+        print("Active run detected. Waiting for completion before proceeding.")
+        return "Processing previous request. Please wait."
 
 
 # --------------------------------------------------------------
@@ -192,23 +123,37 @@ def create_tool_outputs(run, wa_id):
         run_id=run.id,
         tool_outputs=[
             {
-                "tool_call_id": tool_call_id,
+                "tool_call_id": tool_call.id,
                 "output": json.dumps(responses)
             },
         ]
     )
 
 
-
-def delete_existing_runs(thread_id):
-    # Remove any existing runs
-    runs = client.beta.threads.runs.list(
-        thread_id=thread_id
-        )
+# Check if there are any active runs for the thread
+def check_for_active_runs(thread_id):
+    # Retrieve all runs for the thread
+    runs = client.beta.threads.runs.list(thread_id=thread_id)
+    # Check if any run is in progress, requires action, or is queued
     for run in runs.data:
-        if run.status is "in_progress" or run.status is "requires_action" or run.status is "queued" or run.status is "cancelling":
-            run = client.beta.threads.runs.cancel(
-                thread_id=thread_id,
-                run_id=run.id
-                )
+        if run.status in ["in_progress", "requires_action", "queued", "cancelling"]:
+            return True  # An active run exists
+    return False  # No active runs
             
+# Delete any existing runs for the thread
+def delete_existing_runs(thread_id):
+    # Retrieve all runs for the thread
+    runs = client.beta.threads.runs.list(thread_id=thread_id)
+    for run in runs.data:
+        # Check if the run is in a state that allows for cancellation
+        if run.status in ["in_progress", "requires_action", "queued", "cancelling"]:
+            print(f"Cancelling run: {run.id} with status: {run.status}")
+            try:
+                # Attempt to cancel the run
+                cancelled_run = client.beta.threads.runs.cancel(
+                    thread_id=thread_id,
+                    run_id=run.id
+                )
+                print(f"Successfully cancelled run: {run.id}")
+            except Exception as e:
+                print(f"Error cancelling run {run.id}: {str(e)}")
