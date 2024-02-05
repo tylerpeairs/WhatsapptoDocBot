@@ -1,14 +1,13 @@
-
-
-Put batch update in the schema with the document id and passed the get response to the chatbot and specific instructions
-4. Play with doc api to figure out how to manipulate.
-5. set up agent to manipulate doc api with message content
+1. Step through code and delete useless debug information
+2. Determine why multiple runs are being created
+https://community.openai.com/t/beta-completion-runtools/531973
 6. Look into application security
 7. Unit tests
 8. Try/Catch
 9. Production
 10. Other TODO's
-11. Can you track token usage by user instead of making new OpenAI API key for each user?
+11. Can you track token usage by user instead of making new OpenAI API key for each user? then charge based off token_usage
+you could create a basic tier of 100 messages per month based off expected token usage on 100 messages
 
 get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
 
@@ -19,3 +18,10 @@ get recipient whatsapp id from webhook instead of storing it as env variable, at
 4. 2nd message after auth should be a document link
 5. initiate a get doc function in assistant by passing in document id then console log it
 6. initiate a batch update function in assistant by passing in doc id and whatsapp message, telling it in the prompt to update headers, move to many shot
+
+
+
+https://cookbook.openai.com/examples/assistants_api_overview_python
+You really only need the update request from the chatbot since document id is in document_content and credentials are available via wa_id
+
+#Create and test new assistant with updated instructions and functions

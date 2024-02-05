@@ -34,15 +34,9 @@ def get_google_doc(credentials, document_id):
     try:
         # Use the Google Docs service to get the specified document by ID
         document = service.documents().get(documentId=document_id).execute()
-        
-        # Print some information about the document
-        print(f"Document retrieved successfully: {document['title']} (ID: {document['documentId']})")
-        
         # Return the document object
         return document
     except Exception as e:
-        # If an error occurs, print it and return None
-        print(f"Error retrieving document: {e}")
         return None
     
 
@@ -61,12 +55,6 @@ def batch_update_google_docs_document(credentials, document_id, update_requests)
     return result
 
 
-"""
-1. Create an assistant which we can pass document_content, credentials, whatsapp message, and the document_id
-2. Have this assistant take the document_content and whatsapp message to create an text_update_request
-3. Have this assistant call the batch_update_google_docs_document function with the text_update_request
-4. Send a whatsapp message confirming the batch update
-"""
 
 """
 def create_append_text_update_request(document, append_text):

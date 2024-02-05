@@ -99,7 +99,6 @@ def process_whatsapp_message(body):
 
     # Check if User Exists and Get Their Credentials
     credentials = get_user_credentials(wa_id)
-    logging.info(f"credentials: {credentials}")
 
 
     # If user credentials do not exist, prompt the user to login
@@ -110,7 +109,6 @@ def process_whatsapp_message(body):
     else:
         # Check if the user has a document
         if get_most_recent_document(wa_id) is None:
-            logging.info(f"User {wa_id} does not have a document")
             # Create a new document
             document_details = create_google_docs_document(credentials)
             document_title = document_details['title']
@@ -119,7 +117,6 @@ def process_whatsapp_message(body):
             store_document_details(wa_id, document_title, document_id)
             document_content = get_google_doc(credentials, document_id)
         else:
-            logging.info(f"User {wa_id} has a document")
             # Get the most recent document
             document = get_most_recent_document(wa_id)
             document_id = document['document_id']
