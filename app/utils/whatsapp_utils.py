@@ -11,8 +11,9 @@ import re
 # Import the database
 from ..models import User, Document
 from ..database import get_user_credentials, store_document_details, get_most_recent_document
-from .google_doc_utils import create_google_docs_document, get_google_doc, batch_update_google_docs_document, create_append_text_update_request
+from .google_doc_utils import create_google_docs_document, get_google_doc, batch_update_google_docs_document
 from google.oauth2.credentials import Credentials
+from .openai_assistant_utils import generate_response
 
 # Update Whatsapp Utils for any credentials related references
 # Update Prompt to pass in credentials object instead
@@ -39,13 +40,6 @@ def get_text_message_input(recipient, text):
             "text": {"preview_url": False, "body": text},
         }
     )
-
-
-# Send a custom text WhatsApp message which responds to the user's message in uppercase
-#TODO: delete for OpenAI generation
-def generate_response(response):
-    # Return text in uppercase
-    return response.upper()
 
 # Send a custom text WhatsApp message
 def send_message(data):
@@ -102,9 +96,6 @@ def process_whatsapp_message(body):
     # Extract the user's WhatsApp ID and name
     wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
 
-    # Extract the user's message text
-    text_body = body['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
-
 
     # Check if User Exists and Get Their Credentials
     credentials = get_user_credentials(wa_id)
@@ -133,9 +124,10 @@ def process_whatsapp_message(body):
             document = get_most_recent_document(wa_id)
             document_id = document['document_id']
             document_content = get_google_doc(credentials, document_id)
-            update_request = create_append_text_update_request(document_content, text_body)
-            batch_update_google_docs_document(credentials, document_id, update_request)
-            response = f"Updated document with your text: https://docs.google.com/document/d/{document_id}/edit."
+            response = generate_response(body, wa_id, document_content, credentials)
+            #update_request = create_append_text_update_request(document_content, text_body)
+            #batch_update_google_docs_document(credentials, document_id, update_request)
+            
 
   
 
@@ -144,9 +136,8 @@ def process_whatsapp_message(body):
     message = body["entry"][0]["changes"][0]["value"]["messages"][0]
     message_body = message["text"]["body"]
 
-    # OpenAI Integration
-    #response = generate_response(message_body, wa_id, name)
-    #response = process_text_for_whatsapp(response)
+    # Generate a response text message
+    response = process_text_for_whatsapp(response)
 
     # Prepare Whatsapp JSON and send the message
     data = get_text_message_input(current_app.config["RECIPIENT_WAID"], response)

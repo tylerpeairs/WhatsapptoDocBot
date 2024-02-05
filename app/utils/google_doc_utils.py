@@ -58,7 +58,7 @@ def batch_update_google_docs_document(credentials, document_id, update_requests)
     
     # Print the result or return it for further processing
     print(f"Batch update completed. Result: {result}")
-    return results
+    return result
 
 
 """

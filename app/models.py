@@ -19,6 +19,7 @@ class User(db.Model):
     id = Column(Integer, primary_key=True)
     wa_id = Column(String, unique=True)  # WhatsApp ID
     serialized_credentials = Column(Text)  # Store serialized Google credentials as a JSON string
+    thread_id = Column(String)  # OpenAI thread ID
 
 
 
