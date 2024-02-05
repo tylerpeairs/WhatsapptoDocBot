@@ -103,7 +103,7 @@ Text Added: "Received 300 pesos from Tyler"' """
 def create_assistant(assistant_instructions):
 
     assistant = client.beta.assistants.create(
-        name="WhatsApp Google Doc Assistant v0.8",
+        name="WhatsApp Google Doc Assistant v0.9",
         instructions=assistant_instructions,
         tools = [{
           "type": "function",

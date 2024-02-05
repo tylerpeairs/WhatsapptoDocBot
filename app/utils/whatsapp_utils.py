@@ -7,6 +7,8 @@ from flask import current_app, jsonify, session
 import json
 import requests
 import re
+import datetime
+import time
 
 # Import the database
 from ..models import User, Document
@@ -95,49 +97,57 @@ def process_text_for_whatsapp(text):
 def process_whatsapp_message(body):
     logging.info(f"Received WhatsApp message body: {body}")
 
-    # Extract the user's WhatsApp ID and name
-    wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
-
-
-    # Check if User Exists and Get Their Credentials
-    credentials = get_user_credentials(wa_id)
-
-
-    # If user credentials do not exist, prompt the user to login
-    if not credentials:
-        login_url = f"https://deciding-werewolf-infinitely.ngrok-free.app/login?number={wa_id}"
-        response = f"For me to create and update Google Docs, I will need you to authorize me to access your Google Docs. Please do this at {login_url}" #TODO: Update URL and make it clickable
-    # If
+    # Check timestamp to confirm it's a recent message
+    time_difference_in_minutes = process_message_timestamp(body)
+    # Check if the message was sent within the last minute
+    if time_difference_in_minutes > 1:
+        # If the message is older than 1 minutes, do not process it
+        print("Message is more than a minute old, not processing.") 
+        return
     else:
-        # Check if the user has a document
-        if get_most_recent_document(wa_id) is None:
-            # Create a new document
-            document_details = create_google_docs_document(credentials)
-            document_title = document_details['title']
-            document_id = document_details['document_id']
-            # Store the document details in the database
-            store_document_details(wa_id, document_title, document_id)
-            document_content = get_google_doc(credentials, document_id)
+        # Extract the user's WhatsApp ID and name
+        wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
+
+
+        # Check if User Exists and Get Their Credentials
+        credentials = get_user_credentials(wa_id)
+
+
+        # If user credentials do not exist, prompt the user to login
+        if not credentials:
+            login_url = f"https://deciding-werewolf-infinitely.ngrok-free.app/login?number={wa_id}"
+            response = f"For me to create and update Google Docs, I will need you to authorize me to access your Google Docs. Please do this at {login_url}" #TODO: Update URL and make it clickable
+        # If
         else:
-            # Get the most recent document
-            document = get_most_recent_document(wa_id)
-            document_id = document['document_id']
-            document_content = get_google_doc(credentials, document_id)
-            logging.info(f"Document Content: {document_content}")
-            response = generate_response(body, wa_id, document_content, credentials)
-            #update_request = create_append_text_update_request(document_content, text_body)
-            #batch_update_google_docs_document(credentials, document_id, update_request)
-            
+            # Check if the user has a document
+            if get_most_recent_document(wa_id) is None:
+                # Create a new document
+                document_details = create_google_docs_document(credentials)
+                document_title = document_details['title']
+                document_id = document_details['document_id']
+                # Store the document details in the database
+                store_document_details(wa_id, document_title, document_id)
+                document_content = get_google_doc(credentials, document_id)
+            else:
+                # Get the most recent document
+                document = get_most_recent_document(wa_id)
+                document_id = document['document_id']
+                document_content = get_google_doc(credentials, document_id)
+                logging.info(f"Document Content: {document_content}")
+                response = generate_response(body, wa_id, document_content, credentials)
+                #update_request = create_append_text_update_request(document_content, text_body)
+                #batch_update_google_docs_document(credentials, document_id, update_request)
+                
 
-  
+    
 
-    name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
-    # Extract the message & message type
-    message = body["entry"][0]["changes"][0]["value"]["messages"][0]
-    message_body = message["text"]["body"]
+        name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
+        # Extract the message & message type
+        message = body["entry"][0]["changes"][0]["value"]["messages"][0]
+        message_body = message["text"]["body"]
 
-    # Generate a response text message
-    response = process_text_for_whatsapp(response)
+        # Generate a response text message
+        response = process_text_for_whatsapp(response)
 
     # Prepare Whatsapp JSON and send the message
     data = get_text_message_input(current_app.config["RECIPIENT_WAID"], response)
@@ -145,23 +155,6 @@ def process_whatsapp_message(body):
 
 # Check if the incoming payload is a valid WhatsApp message
 def is_valid_whatsapp_message(body):
-
-    # Extract message ID
-    message_id = body.get("entry", [{}])[0].get("changes", [{}])[0].get("value", {}).get("messages", [{}])[0].get("id")
-    
-    # Check for the necessary structure and if the message ID has not been processed
-    if (
-        body.get("object")
-        and body.get("entry")
-        and body["entry"][0].get("changes")
-        and body["entry"][0]["changes"][0].get("value")
-        and body["entry"][0]["changes"][0]["value"].get("messages")
-        and body["entry"][0]["changes"][0]["value"]["messages"][0]
-        and message_id not in processed_messages  # Check if message ID is not in the processed messages set
-    ):
-        # Mark the message ID as processed
-        processed_messages.add(message_id)
-    
     return (
         body.get("object")
         and body.get("entry")
@@ -171,5 +164,27 @@ def is_valid_whatsapp_message(body):
         and body["entry"][0]["changes"][0]["value"]["messages"][0]
     )
 
-def clear_processed_messages():
-    processed_messages.clear()
+
+# Determine if message timestamp is greater than 5 minutes old
+def process_message_timestamp(body):
+    # Assuming the structure of the message body remains consistent
+    message_timestamp = body['entry'][0]['changes'][0]['value']['messages'][0]['timestamp']
+
+    # Convert the message timestamp to a integer object
+    message_timestamp = int(message_timestamp)
+    
+    # Convert the message timestamp to a datetime object
+    message_datetime = datetime.datetime.utcfromtimestamp(message_timestamp)
+    
+    # Get the current datetime in UTC
+    current_datetime_utc = datetime.datetime.utcnow()
+    
+    # Calculate the difference between the current time and the message time
+    time_difference = current_datetime_utc - message_datetime
+    
+    # Convert time difference to minutes
+    time_difference_in_minutes = time_difference.total_seconds() / 60
+    
+    return time_difference_in_minutes
+
+        

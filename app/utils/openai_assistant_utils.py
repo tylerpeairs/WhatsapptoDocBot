@@ -4,7 +4,7 @@ import logging
 import os
 import time
 import json
-from app.database import store_thread, get_most_recent_document, get_user_credentials, check_if_thread_exists
+from app.database import store_thread, get_most_recent_document, get_user_credentials, check_if_thread_exists, update_token_usage
 from .google_doc_utils import batch_update_google_docs_document
 
 load_dotenv()
@@ -39,11 +39,10 @@ def generate_response(message_body, wa_id, document_content, credentials):
         thread = client.beta.threads.retrieve(thread_id)
         print(f"Thread Retrieved: {thread}")
 
-    # Ensure all previous runs are deleted/cancelled before proceeding
-    delete_existing_runs(thread_id)
+    existing_run = check_for_active_runs(thread_id)
 
     # Check for any existing active runs and only proceed if none are found
-    if not check_for_active_runs(thread_id):
+    if existing_run is None:
         # Prepare the structured message content
         whatsapp_text = message_body
         content_to_send = {
@@ -64,34 +63,49 @@ def generate_response(message_body, wa_id, document_content, credentials):
         return new_message
     else:
         print("Active run detected. Waiting for completion before proceeding.")
-        return "Processing previous request. Please wait."
+        new_message = run_assistant(thread, wa_id, run)
+        return "Processing previous request. Please wait and resubmit your message after." #TODO: queing message
 
 
 # --------------------------------------------------------------
 # Run assistant
 # --------------------------------------------------------------
-def run_assistant(thread, wa_id):
-    # Retrieve the Assistant
-    assistant = client.beta.assistants.retrieve(ASSISTANT_ID)
+def run_assistant(thread, wa_id, run=None):
+    # Define an initial run if not provided
+    if run is None:
+        # Retrieve the Assistant
+        assistant = client.beta.assistants.retrieve(ASSISTANT_ID)
 
-    # Run the assistant
-    run = client.beta.threads.runs.create(
-        thread_id=thread.id,
-        assistant_id=assistant.id,
-    )
-
+        # Start a new run
+        run = client.beta.threads.runs.create(
+            thread_id=thread.id,
+            assistant_id=assistant.id,
+        )
     
-    # Wait for completion
+    #Implement run check count
+    run_check_count = 0
+
+  
+        # Wait for completion
     while run.status != "completed":
-        #Check if the run requires action and the action is to submit tool outputs
-        if run.status == 'requires_action' and run.required_action.type == 'submit_tool_outputs':
-            create_tool_outputs(run, wa_id)
+        run_check_count += 1
+        if run_check_count < 6:
+            #Check if the run requires action and the action is to submit tool outputs
+            if run.status == 'requires_action' and run.required_action.type == 'submit_tool_outputs':
+                create_tool_outputs(run, wa_id)
 
-        # Be nice to the API
-        time.sleep(10)
-        run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-        
+            # Be nice to the API
+            time.sleep(10)
+            run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+        else:
+            print("Run check count exceeded. Deleting all runs.")
+            delete_existing_runs(thread.id)
+            return "We had an issue processing your message. Submit it again."
 
+    # Update the total token usage for the user
+    total_token_usage = run.usage.total_tokens
+    update_token_usage(wa_id, int(total_token_usage))
+    logging.info(f"Total token usage for user {wa_id}: {total_token_usage}")
 
     # Retrieve the Messages
     messages = client.beta.threads.messages.list(thread_id=thread.id)
@@ -136,9 +150,9 @@ def check_for_active_runs(thread_id):
     runs = client.beta.threads.runs.list(thread_id=thread_id)
     # Check if any run is in progress, requires action, or is queued
     for run in runs.data:
-        if run.status in ["in_progress", "requires_action", "queued", "cancelling"]:
-            return True  # An active run exists
-    return False  # No active runs
+        if run.status in ["requires_action"]:
+            return run
+    return None  # No active runs
             
 # Delete any existing runs for the thread
 def delete_existing_runs(thread_id):

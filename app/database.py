@@ -106,3 +106,9 @@ def check_if_thread_exists(wa_id):
         return None
     else:
         return thread_id
+    
+# Update token usage
+def update_token_usage(wa_id, usage):
+    user = User.query.filter_by(wa_id=wa_id).first()
+    user.token_usage += usage
+    db.session.commit()

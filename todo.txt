@@ -1,6 +1,12 @@
-1. Step through code and delete useless debug information
-2. Determine why multiple runs are being created
-https://community.openai.com/t/beta-completion-runtools/531973
+2. Consider additional prompt engineering: many-shot approach, retrieval/fine-tuning, conversations v single message inputs
+3. Collect token counts per user, collect document_contents, and update_requests in order to fine-tune/embed
+4. You can probably prompt engineer test directly within the assistant_starter now that credentials are gone
+5. What do you consider production requirements? 
+
+
+You could probbaly pass just document content to save on tokens;
+
+
 6. Look into application security
 7. Unit tests
 8. Try/Catch
@@ -28,3 +34,13 @@ You really only need the update request from the chatbot since document id is in
 
 
 salesforce & notion & airtable connections
+
+Add speach-to-text processing
+
+
+Production Ready
+1. Can handle 10 edge cases from prompting in the same thread
+2. Can handle multiple run instances without receiving an error
+3. Can track usage by user
+4. Application security
+5. 
