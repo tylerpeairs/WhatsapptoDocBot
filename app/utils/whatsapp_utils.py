@@ -3,7 +3,7 @@
 # Import the required libraries
 from functools import update_wrapper
 import logging
-from flask import current_app, jsonify, session, 
+from flask import current_app, jsonify, session 
 import json
 import requests
 import re
