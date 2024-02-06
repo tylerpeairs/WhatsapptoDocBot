@@ -27,15 +27,16 @@ def create_google_docs_document(credentials):
     return {'document_id': doc['documentId'], 'document_title': document_title}
 
 
-def get_google_doc(credentials, document_id):
+def get_google_doc_content(credentials, document_id):
     # Build the Google Docs service
     service = build('docs', 'v1', credentials=credentials)
     
     try:
         # Use the Google Docs service to get the specified document by ID
         document = service.documents().get(documentId=document_id).execute()
+        doc_content = document.get('body').get('content')
         # Return the document object
-        return document
+        return doc_content
     except Exception as e:
         return None
     

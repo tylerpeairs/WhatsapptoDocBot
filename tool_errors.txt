@@ -1,0 +1,15 @@
+2024-02-06 16:48:46,814 - werkzeug - INFO - Press CTRL+C to quit
+2024-02-06 16:48:46,816 - werkzeug - INFO -  * Restarting with stat
+2024-02-06 16:48:49,417 - root - INFO - Message Body: Got 300 pesos Tyler
+2024-02-06 16:48:49,418 - root - INFO - Document Categories: ['Money Received', 'Legal', 'Prospects']
+2024-02-06 16:48:49,418 - root - INFO - Message and Categorization Input Content: {'whatsapp_text_message': 'Got 300 pesos Tyler', 'categories': ['Money Received', 'Legal', 'Prospects']}
+2024-02-06 16:48:51,215 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-06 16:48:51,232 - root - INFO - Response: ChatCompletion(id='chatcmpl-8pOXClDPUenlq9duHQE8ex0uPspog', choices=[Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='Message: Tyler received 300 pesos.\nCategory: Money Received', role='assistant', function_call=None, tool_calls=None))], created=1707259730, model='gpt-4-0125-preview', object='chat.completion', system_fingerprint='fp_f084bcfc79', usage=CompletionUsage(completion_tokens=12, prompt_tokens=195, total_tokens=207))
+2024-02-06 16:48:51,232 - root - INFO - Message Body: Permit problems Ventanilla
+2024-02-06 16:48:51,232 - root - INFO - Document Categories: ['Money Received', 'Legal', 'Prospects', 'Money Owed', 'To-Do']
+2024-02-06 16:48:51,232 - root - INFO - Message and Categorization Input Content: {'whatsapp_text_message': 'Permit problems Ventanilla', 'categories': ['Money Received', 'Legal', 'Prospects', 'Money Owed', 'To-Do']}
+2024-02-06 16:48:52,935 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-06 16:48:52,939 - root - INFO - Response: ChatCompletion(id='chatcmpl-8pOXDigQPikw7MRzP1iV1MIsHHMBf', choices=[Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='Message: We are currently experiencing issues with obtaining permits at Ventanilla.\nCategory: Legal', role='assistant', function_call=None, tool_calls=None))], created=1707259731, model='gpt-4-0125-preview', object='chat.completion', system_fingerprint='fp_f084bcfc79', usage=CompletionUsage(completion_tokens=18, prompt_tokens=206, total_tokens=224))
+2024-02-06 16:48:53,107 - root - INFO - Flask app started
+2024-02-06 16:48:53,146 - werkzeug - WARNING -  * Debugger is active!
+2024-02-06 16:48:53,170 - werkzeug - INFO -  * Debugger PIN: 133-104-768

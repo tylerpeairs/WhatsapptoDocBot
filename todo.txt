@@ -51,10 +51,3 @@ Production Ready
 3. Can track usage by user
 4. Application security
 5. 
-
-
-1. Learn prompt engineering best practies
-2. Generate your best prompt attempt
-3. Find resources to make iterations of the prompt for testing
-4. Come up with 10 test cases for the prompt
-5. Use resources to test the prompt against different models w/ various temperatues

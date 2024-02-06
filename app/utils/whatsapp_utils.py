@@ -13,9 +13,9 @@ import time
 # Import the database
 from ..models import User, Document
 from ..database import get_user_credentials, store_document_details, get_most_recent_document
-from .google_doc_utils import create_google_docs_document, get_google_doc, batch_update_google_docs_document
+from .google_doc_utils import create_google_docs_document, get_google_doc_content, batch_update_google_docs_document
 from google.oauth2.credentials import Credentials
-from .openai_assistant_utils import generate_response
+from .openai_chat_completion_utils import generate_response
 
 processed_messages = set()  # This will keep track of processed message IDs
 
@@ -134,17 +134,10 @@ def process_whatsapp_message(body):
                 document_id = document['document_id']
                 document_content = get_google_doc(credentials, document_id)
                 logging.info(f"Document Content: {document_content}")
-                response = generate_response(body, wa_id, document_content, credentials)
+                whatsapp_response = generate_response(body, wa_id, document_content, credentials)
                 #update_request = create_append_text_update_request(document_content, text_body)
                 #batch_update_google_docs_document(credentials, document_id, update_request)
-                
 
-    
-
-        name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
-        # Extract the message & message type
-        message = body["entry"][0]["changes"][0]["value"]["messages"][0]
-        message_body = message["text"]["body"]
 
         # Generate a response text message
         response = process_text_for_whatsapp(response)
