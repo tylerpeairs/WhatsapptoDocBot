@@ -42,7 +42,6 @@ def get_authorization_url(client_config, scopes):
     # Store the state in the session for later verification
     session['oauth_state'] = state
 
-
     # Create a new Flow instance
     flow = Flow.from_client_config(
         client_config=client_config,
@@ -59,6 +58,7 @@ def get_authorization_url(client_config, scopes):
 
     return authorization_url, state
 
+# Get the credentials from the authorization code
 def get_credentials_from_session(session):
     # Parse the JSON string in session['credentials'] back to a dictionary
     credentials_dict = json.loads(session['credentials'])

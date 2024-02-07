@@ -13,14 +13,9 @@ import time
 # Import the database
 from ..models import User, Document
 from ..database import get_user_credentials, store_document_details, get_most_recent_document
-from .google_doc_utils import create_google_docs_document, get_google_doc_content, batch_update_google_docs_document
+from .google_doc_utils import create_google_docs_document, get_google_doc_content, batch_update_google_docs_document, create_update_requests
 from google.oauth2.credentials import Credentials
-from .openai_chat_completion_utils import generate_response
-
-processed_messages = set()  # This will keep track of processed message IDs
-
-# Update Whatsapp Utils for any credentials related references
-# Update Prompt to pass in credentials object instead
+from app.utils.openai.openai_call_utils import generate_response
 
 
 # Import the OpenAI service
@@ -125,22 +120,26 @@ def process_whatsapp_message(body):
                 document_details = create_google_docs_document(credentials)
                 document_title = document_details['title']
                 document_id = document_details['document_id']
+                document_content = get_google_doc_content(credentials, document_id)
                 # Store the document details in the database
                 store_document_details(wa_id, document_title, document_id)
-                document_content = get_google_doc(credentials, document_id)
             else:
                 # Get the most recent document
                 document = get_most_recent_document(wa_id)
                 document_id = document['document_id']
-                document_content = get_google_doc(credentials, document_id)
-                logging.info(f"Document Content: {document_content}")
-                whatsapp_response = generate_response(body, wa_id, document_content, credentials)
-                #update_request = create_append_text_update_request(document_content, text_body)
-                #batch_update_google_docs_document(credentials, document_id, update_request)
+                document_content = document['body']['content']
+            
+            message, categorization = generate_response(body, wa_id, document_content, credentials
+                                                        )
+            update_request = create_update_requests(document_content, categorization, message)
+            batch_update_google_docs_document(credentials, document_id, update_request)
+
+            doc_link = f'https://docs.google.com/document/d/{document_id}/edit'
+            whatsapp_response = 'Message Added: ' + message + '\nCategory: ' + categorization + '\nAccess Doc: ' + doc_link
 
 
         # Generate a response text message
-        response = process_text_for_whatsapp(response)
+        response = process_text_for_whatsapp(whatsapp_response)
 
     # Prepare Whatsapp JSON and send the message
     data = get_text_message_input(current_app.config["RECIPIENT_WAID"], response)
