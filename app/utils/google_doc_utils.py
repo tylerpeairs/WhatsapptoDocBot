@@ -88,20 +88,15 @@ def create_update_requests(doc_content, category, text):
 
     # Determine if the input category exists and where to insert the text
     if category in existing_categories:
-        category_start_index = existing_categories[category]
-        insert_position = category_start_index + len(category) + 1  # Include newline character
+        # Changed to get the 'endIndex' of the category's last content
+        category_info = existing_categories[category]
+        insert_position = category_info['endIndex']
 
-        # Iterate through document content to find the position right before the next HEADING_1 after the category
-        for element in doc_content:
-            if 'paragraph' in element and element.get('startIndex', 0) > category_start_index:
-                paragraph_style = element['paragraph'].get('paragraphStyle', {}).get('namedStyleType')
-                if paragraph_style == 'HEADING_1':
-                    insert_position = element['startIndex']  # Position before the next HEADING_1
-                    break
-
-        print("Insert position:", insert_position)
         text_insert_request, text_style_request = insert_text_request(insert_position, text + '\n', 'NORMAL_TEXT')
         update_requests.extend([text_insert_request, text_style_request])
+
+
+        print("Insert position:", insert_position)
 
     else:
         # Category does not exist, create a new category at the end with HEADING_1 style
@@ -128,6 +123,8 @@ def parse_existing_categories(doc_content):
     end_index_of_last_paragraph = 2
     contents = doc_content.get('content', [])
 
+    current_category = None
+
     # Parse the existing document structure to find HEADING_1 categories and their positions
     for content in contents:
         if 'paragraph' in content and 'paragraphStyle' in content['paragraph']:
@@ -136,7 +133,15 @@ def parse_existing_categories(doc_content):
                 text_content = ''.join(element['textRun']['content'] for element in content['paragraph']['elements'])
                 # Removing trailing newlines for comparison
                 clean_text_content = text_content.rstrip('\n')
-                existing_categories[clean_text_content] = content['startIndex']
+                existing_categories[clean_text_content] = {
+                    'startIndex': content['startIndex'],
+                    'endIndex': content['endIndex']
+                }
+                current_category = clean_text_content
+            else:
+                # Update the end index for the current category
+                if current_category is not None:
+                    existing_categories[current_category]['endIndex'] = content['endIndex']
         end_index_of_last_paragraph = max(end_index_of_last_paragraph, content.get('endIndex', 1))
 
     return existing_categories, end_index_of_last_paragraph
