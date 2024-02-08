@@ -1,0 +1,7 @@
+No test function found for configure_logging
+No test function found for create_app
+No test function found for load_configurations
+No test function found for redirect
+No test function found for register_blueprints
+No test function found for render_template
+No test function found for url_for

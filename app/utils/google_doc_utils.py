@@ -1,12 +1,8 @@
 # This file contains the functions to create a new Google Docs document, get the content of a Google Docs document, and batch update a Google Docs document.
 
 # Import the required modules
-from tkinter import N
 from googleapiclient.discovery import build
-from google.oauth2.credentials import Credentials
 from datetime import datetime
-
-from numpy import empty, insert
 
 # Create a new Google Docs document
 def create_google_docs_document(credentials):
@@ -130,9 +126,10 @@ def create_update_requests(doc_content, category, text):
 def parse_existing_categories(doc_content):
     existing_categories = {}
     end_index_of_last_paragraph = 2
+    contents = doc_content.get('content', [])
 
     # Parse the existing document structure to find HEADING_1 categories and their positions
-    for content in doc_content:
+    for content in contents:
         if 'paragraph' in content and 'paragraphStyle' in content['paragraph']:
             style = content['paragraph']['paragraphStyle'].get('namedStyleType')
             if style == 'HEADING_1':

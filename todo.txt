@@ -1,29 +1,28 @@
-
-3. Collect token counts per user, 
-4. You can probably prompt engineer test directly within the assistant_starter now that credentials are gone
-5. What do you consider production requirements? 
-
-
-You could probbaly pass just document content to save on tokens; in most cases you don't need to push messages to a thread and can save on tokens
+1. Collect token counts per user
+2. Build test directories and cases, Use chatgpt to generate more prompt engingeering & function Tests, automated testing suite, add embeddings/fine-tun for classification
+3. Application Security Review
+4. Error collection & handling for the user, collect document_contents, and update_requests in order to fine-tune/embed
+5. get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
 
 
-10. Other TODO's
 
+Continue to prompt engineer for 10 edge cases.
 
 
 
 
+last 10 examples as 10-hot
+User feedback
+User added categorization
+Delete
 
 
-Production Ready
-3. Can track usage by user
-get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
-4. Application security
-5. Generated Tests
+
+
 
 
 Nice to have:
+Tests for longer text strings
 Add speach-to-text processing
 salesforce & notion & airtable connections
-collect document_contents, and update_requests in order to fine-tune/embed
 assistant model with message threads for categorization recommendations

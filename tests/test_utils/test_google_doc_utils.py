@@ -2,6 +2,8 @@ import unittest
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 import sys
+import difflib
+import json
 sys.path.append('/Users/tylerpeairs/SoftwareProjects/TestChatbot/python-whatsapp-bot/')
 from app.utils.google_doc_utils import create_update_requests, batch_update_google_docs_document
 
@@ -172,11 +174,10 @@ class TestUpdateRequestUtils(unittest.TestCase):
                 }
             ]
             }
-        print("Expected Output:", expected_output)
         
         output = create_update_requests(doc_content, category, text)
-        print("Output:", output)
-        self.assertEqual(output, expected_output) 
+        self.assertEqual(output, expected_output,'\n' + '\n'.join(difflib.ndiff((json.dumps(expected_output)).splitlines(), (json.dumps(output)).splitlines())))
+
     def test_create_update_requests_new_category(self):
         doc_content = {
             "content": [
@@ -302,9 +303,7 @@ class TestUpdateRequestUtils(unittest.TestCase):
             ]
         }
         output = create_update_requests(doc_content, category, text)
-        print("Expected Output:", expected_output)
-        print("Output:", output)
-        self.assertEqual(output, expected_output)
+        self.assertEqual(output, expected_output,'\n' + '\n'.join(difflib.ndiff((json.dumps(expected_output)).splitlines(), (json.dumps(output)).splitlines())))
     def test_create_update_requests_empty_document(self):
         doc_content = {
             "content": [
@@ -389,7 +388,7 @@ class TestUpdateRequestUtils(unittest.TestCase):
         }
         output = create_update_requests(doc_content, category, text)
 
-        self.assertEqual(output, expected_output)
+        self.assertEqual(output, expected_output,'\n' + '\n'.join(difflib.ndiff((json.dumps(expected_output)).splitlines(), (json.dumps(output)).splitlines())))
 
 
 class TestBatchUpdateGoogleDocsDocument(TestCase):

@@ -14,7 +14,7 @@ OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
 client = OpenAI(api_key=OPEN_AI_API_KEY)
 
 system_content = '''
-You are an expert at making whatsapp text messages more readable and categorizing them. A user will provide inputs and you will follow the instructions and rules.
+You are an expert at making whatsapp text messages more readable and categorizing them. A user will provide inputs and you will follow the instructions step-by-step and obey the rules.
 
 # Inputs
 whatsapp_text_message: {{whatsapp_text_message}}
@@ -36,23 +36,23 @@ categories: {{categories}}
 Example 1 Input:
 whatsapp_text_message: "Got 300 pesos Tyler"
 categories: ""
-Exampe 1 Output:
-Message: "Received 300 pesos from Tyler."
-Category: "Money Received"
+Example 1 Output:
+Message: Received 300 pesos from Tyler.
+Category: Money Received
 
 Example 2 Input:
 whatsapp_text_message: "Got 300 pesos Tyler"
 categories: "Personal, Legal"
-Exampe 2 Output:
-Message: "Received 300 pesos from Tyler."
-Category: "Money Received"
+Example 2 Output:
+Message: Received 300 pesos from Tyler.
+Category: Money Received
 
 Example 3 Input:
 whatsapp_text_message: "Finished testing functions in program"
 categories: "Personal, Legal, Money Received, Real Estate"
-Exampe 2 Output:
+Example 3 Output:
 Message: "Finished testing functions in program."
-Category: "Computer Programming"
+Category: Computer Programming
 
 # Output Format
 Message: 
