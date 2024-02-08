@@ -8,7 +8,7 @@ class TestRunnerEventHandler(FileSystemEventHandler):
     def on_modified(self, event):
         if event.src_path.endswith('.py'):
             print(f"Detected changes in {event.src_path}, running tests...")
-            subprocess.run(['python', 'run_tests.py'])
+            subprocess.run(['python3', './tests/run_tests.py'])
 
 if __name__ == "__main__":
     path = sys.argv[1] if len(sys.argv) > 1 else '.'
