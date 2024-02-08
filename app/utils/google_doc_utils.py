@@ -94,12 +94,13 @@ def create_update_requests(doc_content, category, text):
     if category in existing_categories:
         category_start_index = existing_categories[category]
         insert_position = category_start_index + len(category) + 1  # Include newline character
+
         # Iterate through document content to find the position right before the next HEADING_1 after the category
-        for content in doc_content['content']:
-            if 'paragraph' in content and content.get('startIndex', 0) > category_start_index:
-                paragraph_style = content['paragraph'].get('paragraphStyle', {}).get('namedStyleType')
+        for element in doc_content:
+            if 'paragraph' in element and element.get('startIndex', 0) > category_start_index:
+                paragraph_style = element['paragraph'].get('paragraphStyle', {}).get('namedStyleType')
                 if paragraph_style == 'HEADING_1':
-                    insert_position = content['startIndex']  # Position before the next HEADING_1
+                    insert_position = element['startIndex']  # Position before the next HEADING_1
                     break
 
         print("Insert position:", insert_position)
@@ -131,7 +132,7 @@ def parse_existing_categories(doc_content):
     end_index_of_last_paragraph = 2
 
     # Parse the existing document structure to find HEADING_1 categories and their positions
-    for content in doc_content['content']:
+    for content in doc_content:
         if 'paragraph' in content and 'paragraphStyle' in content['paragraph']:
             style = content['paragraph']['paragraphStyle'].get('namedStyleType')
             if style == 'HEADING_1':

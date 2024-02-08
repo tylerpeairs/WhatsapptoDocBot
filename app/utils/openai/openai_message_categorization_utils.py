@@ -13,23 +13,71 @@ load_dotenv()
 OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
 client = OpenAI(api_key=OPEN_AI_API_KEY)
 
+system_content = '''
+You are an expert at making whatsapp text messages more readable and categorizing them. A user will provide inputs and you will follow the instructions and rules.
+
+# Inputs
+whatsapp_text_message: {{whatsapp_text_message}}
+categories: {{categories}}
+
+# Instructions
+1. You will go through the categories array and select the most relevant category for the whatsapp_text_message. If there isn't an extremely relevant and topical category, generate a new, relevant category.
+2. Using the selected or generated category, rewrite the whatsapp_text_message to improve readability and specificity.
+3. Provide the rewritten message and category in the output format.
+
+# Rules
+1. You will always choose or generate a category.
+2. Always format the category and message into the output format.
+3. Don't rewrite the message if it changes the meaning. Just correct punctuation, spelling, and grammar in such cases.
+4. If there are no categories, generate one.
+5. If the chosen category does not seem extremely relevant, generate a new category.
+
+# Examples
+Example 1 Input:
+whatsapp_text_message: "Got 300 pesos Tyler"
+categories: ""
+Exampe 1 Output:
+Message: "Received 300 pesos from Tyler."
+Category: "Money Received"
+
+Example 2 Input:
+whatsapp_text_message: "Got 300 pesos Tyler"
+categories: "Personal, Legal"
+Exampe 2 Output:
+Message: "Received 300 pesos from Tyler."
+Category: "Money Received"
+
+Example 3 Input:
+whatsapp_text_message: "Finished testing functions in program"
+categories: "Personal, Legal, Money Received, Real Estate"
+Exampe 2 Output:
+Message: "Finished testing functions in program."
+Category: "Computer Programming"
+
+# Output Format
+Message: 
+Category: 
+'''
+
 # Function to generate a message and categorization from chat completions
 def generate_message_and_categorization(message_and_categorization_input_content, max_attempts = 2):
+    messages = [
+        {
+        "role": "system",
+        "content": system_content
+        },
+        {
+        "role": "user",
+        "content": message_and_categorization_input_content
+        }
+    ]
+    logging.info(f"Messages: {messages}")
     attempts = 0
     while attempts <= max_attempts:
         try:
             response = client.chat.completions.create(
                 model="gpt-4-0125-preview",
-                messages=[
-                    {
-                    "role": "system",
-                    "content": "You are an expert at making whatsapp text messages more readable and categorizing them. A user will provide inputs and you will follow the instructions and rules.\n\n# Inputs\nwhatsapp_text_message: {{whatsapp_text_message}}\ncategories: {{categories}}\n\n# Instructions\n1. You will go through the category array and select the most relevant category for the whatsapp_text_message. If there isn't a highly relevant category, generate a relevant category.\n2. Using the selected or generated category, rewrite the whatsapp_text_message to improve readability and specificity.\n3. Provide the rewritten message and category in the output format.\n\n# Rules\n1. You will always choose or generate a category.\n2. Always format the category and message into the output format.\n\n# Output Format\nMessage: \nCategory: "
-                    },
-                    {
-                    "role": "user",
-                    "content": message_and_categorization_input_content
-                    }
-                ],
+                messages=messages,
                 temperature=0.5,
                 max_tokens=1000,
                 top_p=1,
@@ -37,6 +85,7 @@ def generate_message_and_categorization(message_and_categorization_input_content
                 presence_penalty=0
             )
             validated_response = validate_and_parse_messaging_categorization(response)
+            logging.info(f"Validated Response: {validated_response}")
             if validated_response[0] == True:
                 return validated_response[1], validated_response[2]
             else:
@@ -50,8 +99,7 @@ def generate_message_and_categorization(message_and_categorization_input_content
 
 # Function to validate and parse the messaging categorization
 def validate_and_parse_messaging_categorization(response):
-    response_message = response
-
+    response_message = response.choices[0].message.content
     # Define the pattern for the expected format 
     pattern = r'^Message: (.+)\nCategory: (.+)$'
 
