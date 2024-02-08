@@ -96,7 +96,7 @@ def create_update_requests(doc_content, category, text):
         update_requests.extend([text_insert_request, text_style_request])
 
 
-        print("Insert position:", insert_position)
+        #print("Insert position:", insert_position)
 
     else:
         # Category does not exist, create a new category at the end with HEADING_1 style
@@ -106,12 +106,12 @@ def create_update_requests(doc_content, category, text):
         else:
             category_string = '\n' + category + '\n'
         category_length = len(category_string) + 1  # Include newline character
-        print("End index of last paragraph:", end_index_of_last_paragraph)
+        #print("End index of last paragraph:", end_index_of_last_paragraph)
         category_insert_index = end_index_of_last_paragraph - 1
-        print("Category insert index:", category_insert_index)
+        #print("Category insert index:", category_insert_index)
         category_insert_request, category_style_request = insert_text_request(category_insert_index, category_string, 'HEADING_1')
         text_insert_index = category_insert_index + category_length - 1
-        print("Text insert index:", text_insert_index)
+        #print("Text insert index:", text_insert_index)
         text_insert_request, text_style_request = insert_text_request(text_insert_index, text + '\n', 'NORMAL_TEXT')
         update_requests.extend([category_insert_request, category_style_request, text_insert_request, text_style_request])
 
