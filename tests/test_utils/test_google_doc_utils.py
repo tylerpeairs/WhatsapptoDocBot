@@ -12,8 +12,7 @@ from app.utils.google_doc_utils import create_update_requests, batch_update_goog
 class TestUpdateRequestUtils(unittest.TestCase):
 
     def test_create_update_requests_existing_category(self):
-        doc_content = {
-            "content": [
+        doc_content = [
             {
                 "endIndex": 1,
                 "sectionBreak": {
@@ -148,7 +147,6 @@ class TestUpdateRequestUtils(unittest.TestCase):
                 }
             }
             ]
-        }
         category = 'Existing Category'
         text = 'Some text'
 
@@ -184,8 +182,7 @@ class TestUpdateRequestUtils(unittest.TestCase):
                  )))    
 
     def test_create_update_requests_new_category(self):
-        doc_content = {
-            "content": [
+        doc_content = [
             {
                 "endIndex": 1,
                 "sectionBreak": {
@@ -257,8 +254,7 @@ class TestUpdateRequestUtils(unittest.TestCase):
                 }
                 }
             }
-            ]
-        }
+        ]
 
         category = 'New Category'
         text = 'Some text'
@@ -312,11 +308,9 @@ class TestUpdateRequestUtils(unittest.TestCase):
                     json.dumps(expected_output, indent=2).splitlines(),
                     json.dumps(output, indent=2).splitlines()
                  )))    
-
     
     def test_create_update_requests_empty_document(self):
-        doc_content = {
-            "content": [
+        doc_content = [
             {
                 "endIndex": 1,
                 "sectionBreak": {
@@ -347,8 +341,7 @@ class TestUpdateRequestUtils(unittest.TestCase):
                 }
                 }
             }
-            ]
-        }
+        ]
         category = 'New Category'
         text = 'Some text'
         
@@ -395,6 +388,294 @@ class TestUpdateRequestUtils(unittest.TestCase):
                 }
                 }
             ]
+        }
+        output = create_update_requests(doc_content, category, text)
+
+        self.assertEqual(output, expected_output, '\n' + '\n'.join(difflib.ndiff(
+                    json.dumps(expected_output, indent=2).splitlines(),
+                    json.dumps(output, indent=2).splitlines()
+                 )))    
+
+    def test_create_update_requests_existing_category_end_of_document_trailing_newline(self):
+        doc_content = [{'endIndex': 1, 'sectionBreak': {'sectionStyle': {'columnSeparatorStyle': 'NONE', 'contentDirection': 'LEFT_TO_RIGHT', 'sectionType': 'CONTINUOUS'}}}, {'startIndex': 1, 'endIndex': 24, 'paragraph': {'elements': [{'startIndex': 1, 'endIndex': 24, 'textRun': {'content': 'Financial Transactions\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.j8f7cok0s5ox', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 24, 'endIndex': 54, 'paragraph': {'elements': [{'startIndex': 24, 'endIndex': 54, 'textRun': {'content': 'Please give Austin 300 pesos.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 54, 'endIndex': 87, 'paragraph': {'elements': [{'startIndex': 54, 'endIndex': 87, 'textRun': {'content': 'Please transfer 500 pesos to Ty.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 87, 'endIndex': 88, 'paragraph': {'elements': [{'startIndex': 87, 'endIndex': 88, 'textRun': {'content': '\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.ymjyujutzmie', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 88, 'endIndex': 101, 'paragraph': {'elements': [{'startIndex': 88, 'endIndex': 101, 'textRun': {'content': 'Social Plans\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.ili04vc9w7k3', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 101, 'endIndex': 145, 'paragraph': {'elements': [{'startIndex': 101, 'endIndex': 145, 'textRun': {'content': 'Are we making any dinner plans for tonight?\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 145, 'endIndex': 146, 'paragraph': {'elements': [{'startIndex': 145, 'endIndex': 146, 'textRun': {'content': '\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.x2a03jgebjrh', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 146, 'endIndex': 165, 'paragraph': {'elements': [{'startIndex': 146, 'endIndex': 165, 'textRun': {'content': 'Technology Inquiry\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.vwvivb1t3aps', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 165, 'endIndex': 393, 'paragraph': {'elements': [{'startIndex': 165, 'endIndex': 393, 'textRun': {'content': "Just watched the videos, that's sick! So, is it live on your phone? Do you need to message or forward messages to a specific number, or if I text you, will it categorize and create a document for this conversation, for example?\n", 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 393, 'endIndex': 394, 'paragraph': {'elements': [{'startIndex': 393, 'endIndex': 394, 'textRun': {'content': '\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.4gm5caif0ni', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 394, 'endIndex': 419, 'paragraph': {'elements': [{'startIndex': 394, 'endIndex': 419, 'textRun': {'content': 'Real Estate Transactions\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.pm0grojsaooo', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 419, 'endIndex': 453, 'paragraph': {'elements': [{'startIndex': 419, 'endIndex': 453, 'textRun': {'content': 'Went to show the land to Alfredo.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 453, 'endIndex': 454, 'paragraph': {'elements': [{'startIndex': 453, 'endIndex': 454, 'textRun': {'content': '\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}]
+        category = 'Real Estate Transactions'
+        text = 'Need to parcel out some land.'
+        
+        expected_output = {
+            "requests": [{'insertText': {'location': {'index': 453}, 'text': 'Need to parcel out some land.\n'}}, {'updateParagraphStyle': {'range': {'startIndex': 453, 'endIndex': 483}, 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT'}, 'fields': 'namedStyleType'}}]
+        }
+        output = create_update_requests(doc_content, category, text)
+
+        self.assertEqual(output, expected_output, '\n' + '\n'.join(difflib.ndiff(
+                    json.dumps(expected_output, indent=2).splitlines(),
+                    json.dumps(output, indent=2).splitlines()
+                 )))
+  
+    def test_create_update_requests_existing_category_end_of_document_no_trailing_newline(self):
+        doc_content = [
+      {
+        "endIndex": 1,
+        "sectionBreak": {
+          "sectionStyle": {
+            "columnSeparatorStyle": "NONE",
+            "contentDirection": "LEFT_TO_RIGHT",
+            "sectionType": "CONTINUOUS"
+          }
+        }
+      },
+      {
+        "startIndex": 1,
+        "endIndex": 24,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 1,
+              "endIndex": 24,
+              "textRun": {
+                "content": "Financial Transactions\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "headingId": "h.j8f7cok0s5ox",
+            "namedStyleType": "HEADING_1",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 24,
+        "endIndex": 54,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 24,
+              "endIndex": 54,
+              "textRun": {
+                "content": "Please give Austin 300 pesos.\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 54,
+        "endIndex": 87,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 54,
+              "endIndex": 87,
+              "textRun": {
+                "content": "Please transfer 500 pesos to Ty.\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 87,
+        "endIndex": 88,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 87,
+              "endIndex": 88,
+              "textRun": {
+                "content": "\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "headingId": "h.ymjyujutzmie",
+            "namedStyleType": "HEADING_1",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 88,
+        "endIndex": 101,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 88,
+              "endIndex": 101,
+              "textRun": {
+                "content": "Social Plans\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "headingId": "h.ili04vc9w7k3",
+            "namedStyleType": "HEADING_1",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 101,
+        "endIndex": 145,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 101,
+              "endIndex": 145,
+              "textRun": {
+                "content": "Are we making any dinner plans for tonight?\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 145,
+        "endIndex": 146,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 145,
+              "endIndex": 146,
+              "textRun": {
+                "content": "\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "headingId": "h.x2a03jgebjrh",
+            "namedStyleType": "HEADING_1",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 146,
+        "endIndex": 165,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 146,
+              "endIndex": 165,
+              "textRun": {
+                "content": "Technology Inquiry\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "headingId": "h.vwvivb1t3aps",
+            "namedStyleType": "HEADING_1",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 165,
+        "endIndex": 393,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 165,
+              "endIndex": 393,
+              "textRun": {
+                "content": "Just watched the videos, that's sick! So, is it live on your phone? Do you need to message or forward messages to a specific number, or if I text you, will it categorize and create a document for this conversation, for example?\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 393,
+        "endIndex": 394,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 393,
+              "endIndex": 394,
+              "textRun": {
+                "content": "\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "headingId": "h.4gm5caif0ni",
+            "namedStyleType": "HEADING_1",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 394,
+        "endIndex": 419,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 394,
+              "endIndex": 419,
+              "textRun": {
+                "content": "Real Estate Transactions\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "headingId": "h.pm0grojsaooo",
+            "namedStyleType": "HEADING_1",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      },
+      {
+        "startIndex": 419,
+        "endIndex": 453,
+        "paragraph": {
+          "elements": [
+            {
+              "startIndex": 419,
+              "endIndex": 453,
+              "textRun": {
+                "content": "Went to show the land to Alfredo.\n",
+                "textStyle": {}
+              }
+            }
+          ],
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT",
+            "direction": "LEFT_TO_RIGHT"
+          }
+        }
+      }
+    ]
+        category = 'Real Estate Transactions'
+        text = 'Need to parcel out some land.'
+        
+        expected_output = {
+            "requests": [{'insertText': {'location': {'index': 452}, 'text': '\nNeed to parcel out some land.\n'}}, {'updateParagraphStyle': {'range': {'startIndex': 452, 'endIndex': 483}, 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT'}, 'fields': 'namedStyleType'}}]
         }
         output = create_update_requests(doc_content, category, text)
 
@@ -511,75 +792,6 @@ class TestGetGoogleDocContent(unittest.TestCase):
         mock_service.documents().get.assert_called_with(documentId=document_id)
         self.assertIsNone(result)
 
-class TestParseExistingCategories(unittest.TestCase):
-
-    def test_parse_existing_categories_no_content(self):
-        doc_content = {}
-        expected_categories = {}
-        expected_end_index = 2
-
-        categories, end_index = parse_existing_categories(doc_content)
-
-        self.assertEqual(categories, expected_categories)
-        self.assertEqual(end_index, expected_end_index)
-
-    def test_parse_existing_categories_no_paragraphs(self):
-        doc_content = {'content': [{'endIndex': 5}]}
-        expected_categories = {}
-        expected_end_index = 5
-
-        categories, end_index = parse_existing_categories(doc_content)
-
-        self.assertEqual(categories, expected_categories)
-        self.assertEqual(end_index, expected_end_index)
-
-    def test_parse_existing_categories_with_categories(self):
-        doc_content = {
-            'content': [
-                {
-                    'startIndex': 1,
-                    'endIndex': 10,
-                    'paragraph': {
-                        'paragraphStyle': {'namedStyleType': 'HEADING_1'},
-                        'elements': [{'textRun': {'content': 'Category1\n'}}]
-                    }
-                },
-                {
-                    'startIndex': 10,
-                    'endIndex': 20,
-                    'paragraph': {
-                        'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT'},
-                        'elements': [{'textRun': {'content': 'Some text\n'}}]
-                    }
-                },
-                {
-                    'startIndex': 20,
-                    'endIndex': 30,
-                    'paragraph': {
-                        'paragraphStyle': {'namedStyleType': 'HEADING_1'},
-                        'elements': [{'textRun': {'content': 'Category2\n'}}]
-                    }
-                },
-                {
-                    'startIndex': 30,
-                    'endIndex': 40,
-                    'paragraph': {
-                        'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT'},
-                        'elements': [{'textRun': {'content': 'Some more text\n'}}]
-                    }
-                },
-            ]
-        }
-        expected_categories = {
-            'Category1': {'startIndex': 1, 'endIndex': 20},
-            'Category2': {'startIndex': 20, 'endIndex': 40},
-        }
-        expected_end_index = 40
-
-        categories, end_index = parse_existing_categories(doc_content)
-
-        self.assertEqual(categories, expected_categories)
-        self.assertEqual(end_index, expected_end_index)
 
 if __name__ == '__main__':
     unittest.main()

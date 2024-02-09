@@ -15,7 +15,7 @@ def generate_response(body, document_content):
     #logging.info(f"Message Body: {message_body}")
 
     # Extract the categories from the document content
-    doc_categories_indexed, _ = parse_existing_categories(document_content)
+    doc_categories_indexed = parse_existing_categories(document_content)
     doc_categories = list(doc_categories_indexed.keys())
     #logging.info(f"Document Categories: {doc_categories}")
 

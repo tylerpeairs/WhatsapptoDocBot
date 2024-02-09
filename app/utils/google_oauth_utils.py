@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 
-# Load environment variables
+# Load environment variabl8es
 load_dotenv()
 CLIENT_ID = os.getenv("OAUTH_CLIENT_ID")
 CLIENT_SECRET = os.getenv("OAUTH_CLIENT_SECRET")

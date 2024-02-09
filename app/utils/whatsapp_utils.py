@@ -83,7 +83,6 @@ def process_text_for_whatsapp(text):
 
 # Process the incoming WhatsApp message
 def process_whatsapp_message(body):
-    logging.info(f"Received WhatsApp message body: {body}")
 
     # Check timestamp to confirm it's a recent message
     time_difference_in_minutes = process_message_timestamp(body)

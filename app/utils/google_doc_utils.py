@@ -1,6 +1,7 @@
 # This file contains the functions to create a new Google Docs document, get the content of a Google Docs document, and batch update a Google Docs document.
 
 # Import the required modules
+from calendar import c
 from googleapiclient.discovery import build
 from datetime import datetime
 
@@ -60,7 +61,8 @@ def batch_update_google_docs_document(credentials, document_id, update_requests)
 
 # Helper function to create an update request for inserting text
 def create_update_requests(doc_content, category, text):
-    # Helper function to create an update request for inserting text
+    update_requests = []
+
     def insert_text_request(location, content, style):
         return {
             'insertText': {
@@ -82,66 +84,96 @@ def create_update_requests(doc_content, category, text):
             }
         }
 
-    existing_categories, end_index_of_last_paragraph = parse_existing_categories(doc_content)
+    # Get end index of the last paragraph
+    def find_insertion_index(existing_categories, category_name, doc_content):
+        category_names = list(existing_categories.keys())
+        print(existing_categories)
 
-    update_requests = []
+        if category_name in existing_categories:
+            category_index = category_names.index(category_name)
+
+            # Check if it's the last category
+            if category_index == len(category_names) - 1:
+                if 'paragraph' in doc_content[-1] and not doc_content[-1]['paragraph']['elements'][0]['textRun']['content'].strip():
+                    # The last element is a newline, use its startIndex - 1
+                    return doc_content[-1]['startIndex']
+                else:
+                    # No trailing newline, use the document's last element's endIndex - 1
+                    return doc_content[-1]['endIndex'] - 1
+                
+            # Not the last category, use the next category's startIndex - 1
+            else:
+                # Not the last category, use the next category's startIndex - 1
+                next_category_name = category_names[category_index + 1]
+                next_category_start = existing_categories[next_category_name]['startIndex']
+                return next_category_start - 1
+            
+        else:
+            # Handle the case for a new category or text insertion at the end of the document
+            last_content = doc_content[-1]
+            
+            # If the last content is a newline, use its startIndex as the insertion index
+            # This effectively places the new category/text just before the trailing newline
+            if last_content_is_newline(doc_content):
+                return last_content['startIndex']
+            
+            # If the last content is not a newline, use the document's last element's endIndex
+            # This adds the new category/text at the very end, even after the trailing newline if it exists
+            return doc_content[-1]['endIndex']
+
+    # Check if the last content is a newline
+    def last_content_is_newline(doc_content):
+        last_content = doc_content[-1]
+        last_content_is_newline = False
+        if 'paragraph' in last_content:
+            last_paragraph_text = ''.join(element['textRun']['content'] for element in last_content['paragraph']['elements']).strip()
+            last_content_is_newline = (last_paragraph_text == '')
+
+        return last_content_is_newline
+    
+    # Parse for existing categories
+    existing_categories = parse_existing_categories(doc_content)
+
+    # Determine the insertion index for the new category and text
+    insertion_index = find_insertion_index(existing_categories, category, doc_content)
 
     # Determine if the input category exists and where to insert the text
     if category in existing_categories:
-        # Changed to get the 'endIndex' of the category's last content
-        category_info = existing_categories[category]
-        insert_position = category_info['endIndex']
-
-        text_insert_request, text_style_request = insert_text_request(insert_position, text + '\n', 'NORMAL_TEXT')
+        if last_content_is_newline(doc_content):
+            text_insert_request, text_style_request = insert_text_request(insertion_index, text + '\n', 'NORMAL_TEXT')
+        else:
+            text_insert_request, text_style_request = insert_text_request(insertion_index, '\n' + text + '\n', 'NORMAL_TEXT')
         update_requests.extend([text_insert_request, text_style_request])
-
-
-        #print("Insert position:", insert_position)
-
     else:
         # Category does not exist, create a new category at the end with HEADING_1 style
-        # and insert the text underneath it with NORMAL_TEXT style
-        if not existing_categories:
-            category_string = category + '\n'
-        else:
-            category_string = '\n' + category + '\n'
+        category_string = '\n' + category + '\n' if existing_categories else category + '\n'
         category_length = len(category_string) + 1  # Include newline character
-        #print("End index of last paragraph:", end_index_of_last_paragraph)
-        category_insert_index = end_index_of_last_paragraph - 1
-        #print("Category insert index:", category_insert_index)
-        category_insert_request, category_style_request = insert_text_request(category_insert_index, category_string, 'HEADING_1')
-        text_insert_index = category_insert_index + category_length - 1
-        #print("Text insert index:", text_insert_index)
+        category_insert_request, category_style_request = insert_text_request(insertion_index, category_string, 'HEADING_1')
+       
+        # and insert the text underneath it with NORMAL_TEXT style
+        text_insert_index = insertion_index + category_length - 1
         text_insert_request, text_style_request = insert_text_request(text_insert_index, text + '\n', 'NORMAL_TEXT')
+        
         update_requests.extend([category_insert_request, category_style_request, text_insert_request, text_style_request])
 
     return {'requests': update_requests}
 
-# Get existing categories and index of last paragraph
+# Get existing categories
 def parse_existing_categories(doc_content):
     existing_categories = {}
-    end_index_of_last_paragraph = 2
-    contents = doc_content.get('content', [])
 
-    current_category = None
-
-    # Parse the existing document structure to find HEADING_1 categories and their positions
-    for content in contents:
+    for content in doc_content:
         if 'paragraph' in content and 'paragraphStyle' in content['paragraph']:
             style = content['paragraph']['paragraphStyle'].get('namedStyleType')
             if style == 'HEADING_1':
                 text_content = ''.join(element['textRun']['content'] for element in content['paragraph']['elements'])
-                # Removing trailing newlines for comparison
                 clean_text_content = text_content.rstrip('\n')
-                existing_categories[clean_text_content] = {
-                    'startIndex': content['startIndex'],
-                    'endIndex': content['endIndex']
-                }
-                current_category = clean_text_content
-            else:
-                # Update the end index for the current category
-                if current_category is not None:
-                    existing_categories[current_category]['endIndex'] = content['endIndex']
-        end_index_of_last_paragraph = max(end_index_of_last_paragraph, content.get('endIndex', 1))
+                if clean_text_content:
+                    existing_categories[clean_text_content] = {
+                        'startIndex': content['startIndex'],
+                        'endIndex': content['endIndex']
+                    }
 
-    return existing_categories, end_index_of_last_paragraph
+    return existing_categories
+
+

@@ -54,7 +54,7 @@ def store_user_credentials(wa_id, credentials):
         
 
 
-# Store document details after using Google Docs API create call. user_id will be wa_id
+# Store document details after uAsing Google Docs API create call. user_id will be wa_id
 def store_document_details(user_id, title, document_id):
     # Create a new Document instance with the provided details
     new_document = Document(user_id=user_id, title=title, document_id=document_id)
@@ -81,31 +81,6 @@ def get_most_recent_document(user_id):
     else:
         # Return None or an appropriate message if no document is found
         return None
-    
-
-# Store thread_id for a wa_id
-def store_thread(wa_id, thread_id):
-    user = User.query.filter_by(wa_id=wa_id).first()
-    user.thread_id = thread_id
-    db.session.commit()
-    print(f"Stored thread_id for user with wa_id: {wa_id}")
-
-# Get thread_id for a wa_id
-def get_thread(wa_id):
-    user = User.query.filter_by(wa_id=wa_id).first()
-    return user.thread_id
-    print(f"Retrieved thread_id: {thread_id} for user with wa_id: {wa_id}")
-
-
-# --------------------------------------------------------------
-# Thread management
-# --------------------------------------------------------------
-def check_if_thread_exists(wa_id):
-    thread_id = get_thread(wa_id)
-    if thread_id is None:
-        return None
-    else:
-        return thread_id
     
 # Update token usage
 def update_token_usage(wa_id, usage):
