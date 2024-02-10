@@ -1,15 +1,11 @@
 # Description: OpenAI API call utilities
 
 # Import the required libraries
-import logging
-import json
-from sqlalchemy import JSON 
 from ..google_doc_utils import parse_existing_categories
 from .openai_message_categorization_utils import generate_message_and_categorization
 
-
 # Generate a response from the chat completions
-def generate_response(body, document_content):
+def generate_response(wa_id, body, document_content):
     # Extract the message body
     message_body = body["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
     #logging.info(f"Message Body: {message_body}")
@@ -21,7 +17,7 @@ def generate_response(body, document_content):
 
     # Generate a readable message with a category
     string_message_and_categorization_input_content = f"whatsapp_text_message: {message_body}\ncategories: {'None' if not doc_categories else ', '.join(doc_categories)}"
-    message, categorization = generate_message_and_categorization(string_message_and_categorization_input_content)
+    message, categorization = generate_message_and_categorization(wa_id, string_message_and_categorization_input_content)
     
 
     return message, categorization

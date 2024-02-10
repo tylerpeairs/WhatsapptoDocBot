@@ -7,6 +7,7 @@ import logging
 import re
 from dotenv import load_dotenv
 from openai import OpenAI
+from ...database import update_token_usage
 
 # Load the environment variables
 load_dotenv()
@@ -60,7 +61,7 @@ Category:
 '''
 
 # Function to generate a message and categorization from chat completions
-def generate_message_and_categorization(message_and_categorization_input_content, max_attempts = 2):
+def generate_message_and_categorization(wa_id, message_and_categorization_input_content, max_attempts = 2):
     messages = [
         {
         "role": "system",
@@ -72,7 +73,9 @@ def generate_message_and_categorization(message_and_categorization_input_content
         }
     ]
     attempts = 0
+    token_count = 0
     while attempts <= max_attempts:
+        logging.info(f"Attempt: {attempts}")
         try:
             response = client.chat.completions.create(
                 model="gpt-4-0125-preview",
@@ -84,8 +87,11 @@ def generate_message_and_categorization(message_and_categorization_input_content
                 presence_penalty=0
             )
             validated_response = validate_and_parse_messaging_categorization(response)
+            token_count += response.usage['total_tokens']
             logging.info(f"Validated Response: {validated_response}")
             if validated_response[0] == True:
+                logging.info(f"Token Count: {token_count}")
+                update_token_usage(wa_id, token_count)
                 return validated_response[1], validated_response[2]
             else:
                 attempts += 1

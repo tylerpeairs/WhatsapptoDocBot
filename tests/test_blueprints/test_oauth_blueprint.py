@@ -19,7 +19,7 @@ class TestIndex(TestCase):
         response = self.client.get('/')
         self.assertTrue('/login' in response.location or url_for('oauth.login', _external=True) in response.location)
 
-    @patch('app.flask_blueprints.oauth_blueprint.get_credentials_from_session')
+    @patch('app.blueprints.oauth_blueprint.get_credentials_from_session')
     def test_index_redirects_to_login_if_not_authenticated(self, mock_get_credentials):
         # Instead of mocking valid credentials, simulate a scenario where credentials are not present or invalid
         mock_get_credentials.return_value = None
@@ -32,9 +32,9 @@ class TestIndex(TestCase):
 
 
 
-    @patch('app.flask_blueprints.oauth_blueprint.get_most_recent_document', return_value=None)
-    @patch('app.flask_blueprints.oauth_blueprint.create_google_docs_document', return_value={'document_id': '1', 'document_title': 'Test Document'})
-    @patch('app.flask_blueprints.oauth_blueprint.get_credentials_from_session')
+    @patch('app.blueprints.oauth_blueprint.get_most_recent_document', return_value=None)
+    @patch('app.blueprints.oauth_blueprint.create_google_docs_document', return_value={'document_id': '1', 'document_title': 'Test Document'})
+    @patch('app.blueprints.oauth_blueprint.get_credentials_from_session')
     def test_index_creates_new_document_if_none_exists(self, mock_get_credentials_from_session, mock_create_google_docs_document, mock_get_most_recent_document):
 
         # Mock credentials with all necessary fields
@@ -69,10 +69,9 @@ class TestIndex(TestCase):
         mock_create_google_docs_document.assert_called_once()
         print("mock_create_google_docs_document called with:", mock_create_google_docs_document.call_args)
 
-    @patch('app.flask_blueprints.oauth_blueprint.get_most_recent_document', return_value={'title': 'dummy_title', 'document_id': 'dummy_id'})
-    @patch('app.flask_blueprints.oauth_blueprint.create_google_docs_document', return_value={'document_id': '1', 'document_title': 'Test Document'})
-    @patch('app.flask_blueprints.oauth_blueprint.get_credentials_from_session')
-    def test_index_retrieves_most_recent_document_if_exists(self, mock_get_credentials, mock_create_google_docs_document, mock_get_most_recent_document):
+    @patch('app.blueprints.oauth_blueprint.get_most_recent_document', return_value={'title': 'dummy_title', 'document_id': 'dummy_id'})
+    @patch('app.blueprints.oauth_blueprint.create_google_docs_document', return_value={'document_id': '1', 'document_title': 'Test Document'})
+    def test_index_retrieves_most_recent_document_if_exists(self, mock_create_google_docs_document, mock_get_most_recent_document):
         # Mock credentials with all necessary fields
         mock_credentials_info = {
             'client_id': 'fake-client-id',
@@ -82,12 +81,6 @@ class TestIndex(TestCase):
             'token_uri': 'https://oauth2.googleapis.com/token',
             'scopes': ['https://www.googleapis.com/auth/documents', 'https://www.googleapis.com/auth/drive'],
         }
-
-        # Mock the get_credentials_from_session to return a Credentials object created from the mock info
-        mock_credentials = MagicMock()
-        mock_credentials.valid = True  # Ensure the mock Credentials object is considered valid
-        # If your application checks for specific attributes or methods on the Credentials object, mock them here
-        mock_get_credentials.return_value = mock_credentials
 
         with self.client.session_transaction() as sess:
             sess['credentials'] = json.dumps(mock_credentials_info)  # This line is actually not needed because you're mocking get_credentials_from_session

@@ -121,7 +121,7 @@ def process_whatsapp_message(body):
                 document_id = get_most_recent_document(wa_id)['document_id']
                 document_content = get_google_doc_content(credentials, document_id)
             
-            message, categorization = generate_response(body, document_content)
+            message, categorization = generate_response(wa_id, body, document_content)
             logging.info(f"Document Content: {document_content}")
             update_request = create_update_requests(document_content, categorization, message)
             batch_update_google_docs_document(credentials, document_id, update_request)

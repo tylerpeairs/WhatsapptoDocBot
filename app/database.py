@@ -1,8 +1,6 @@
 # This file is used to create the database object that will be used to interact with the database
 
 # Import the required modules
-from sqlalchemy import true
-from sqlalchemy.exc import SQLAlchemyError
 import logging
 
 # Import models

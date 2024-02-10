@@ -105,7 +105,6 @@ class TestWhatsAppUtils(unittest.TestCase):
         json_data = output.get_json()
         self.assertEqual(json_data, {"status": "error", "message": "Request timed out"})
 
-
     @patch('requests.post')
     def test_send_message_request_exception(self, mock_requests_post):
         data = '{"message": "Hello"}'
@@ -277,7 +276,7 @@ class TestProcessWhatsAppMessage(unittest.TestCase):
         mock_create_google_docs_document.assert_called_once_with(credentials)
         mock_get_google_doc_content.assert_called_once_with(credentials, "mock_document_id")
         mock_store_document_details.assert_called_once_with("1234567890", "Mock Document", "mock_document_id")
-        mock_generate_response.assert_called_once_with(body, document_content)
+        mock_generate_response.assert_called_once_with("1234567890", body, document_content)
         mock_create_update_requests.assert_called_once_with(document_content, categorization, message)
         mock_batch_update_google_docs_document.assert_called_once_with(credentials, "mock_document_id", update_request)
         mock_process_text_for_whatsapp.assert_called_once_with(response)

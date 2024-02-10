@@ -1,1 +1,48 @@
+Detected changes in /Users/tylerpeairs/SoftwareProjects/TestChatbot/python-whatsapp-bot/app/utils/openai/openai_message_categorization_utils.py, running tests...
+..wa_id: dummy_wa_id
+Most recent document: None
+No document found
+Document Test Document with ID 1 stored in database.
+2024-02-10 14:23:49,783 - root - ERROR - Request failed due to: 400 Client Error: Bad Request for url: https://graph.facebook.com/v18.0/246316221888389/messages
+Response status code: 200
+mock_get_most_recent_document called with: call('dummy_wa_id')
+mock_create_google_docs_document called with: call({'client_id': 'fake-client-id', 'client_secret': 'fake-client-secret', 'refresh_token': 'fake-refresh-token', 'token': 'fake-access-token', 'token_uri': 'https://oauth2.googleapis.com/token', 'scopes': ['https://www.googleapis.com/auth/documents', 'https://www.googleapis.com/auth/drive']})
+...wa_id: dummy_wa_id
+Most recent document: {'title': 'dummy_title', 'document_id': 'dummy_id'}
+Most recent document: {'title': 'dummy_title', 'document_id': 'dummy_id'}
+2024-02-10 14:23:50,602 - root - ERROR - Request failed due to: 400 Client Error: Bad Request for url: https://graph.facebook.com/v18.0/246316221888389/messages
+.response:  b'<!doctype html>\n<html lang=en>\n<title>400 Bad Request</title>\n<h1>Bad Request</h1>\n<p>The browser (or proxy) sent a request that this server could not understand.</p>\n'
+..Message is more than a minute old, not processing.
+.2024-02-10 14:23:50,618 - root - INFO - Received a WhatsApp status update.
+....2024-02-10 14:23:50,644 - root - INFO - Signature verification failed!
+......Batch update completed. Result: {'status': 'success'}
+.Created document with ID: abc123
+............2024-02-10 14:23:50,759 - root - ERROR - Error: Simulated error
+2024-02-10 14:23:55,766 - root - ERROR - Error: Simulated error
+2024-02-10 14:24:00,769 - root - ERROR - Error: Simulated error
+.2024-02-10 14:24:05,780 - root - ERROR - Error: 0
+2024-02-10 14:24:10,782 - root - ERROR - Error: 0
+2024-02-10 14:24:15,787 - root - ERROR - Error: 0
+F2024-02-10 14:24:20,811 - root - INFO - Document Content: Mock Document Content
+......2024-02-10 14:24:20,836 - root - ERROR - Request failed due to: 
+.2024-02-10 14:24:20,840 - root - INFO - Status: 200
+2024-02-10 14:24:20,847 - root - INFO - Content-type: <MagicMock name='post().headers.get()' id='4578904240'>
+2024-02-10 14:24:20,850 - root - INFO - Body: <MagicMock name='post().text' id='4578871088'>
+.2024-02-10 14:24:20,855 - root - ERROR - Timeout occurred while sending message
+.
+======================================================================
+FAIL: test_generate_message_and_categorization_success (tests.test_utils.test_openai.test_openai_message_categorization_utils.TestGenerateMessageAndCategorization)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/unittest/mock.py", line 1325, in patched
+    return func(*newargs, **newkeywargs)
+  File "/Users/tylerpeairs/SoftwareProjects/TestChatbot/python-whatsapp-bot/tests/test_utils/test_openai/test_openai_message_categorization_utils.py", line 27, in test_generate_message_and_categorization_success
+    mock_update_token_usage.assert_called_once_with(wa_id, 50)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/unittest/mock.py", line 924, in assert_called_once_with
+    raise AssertionError(msg)
+AssertionError: Expected 'update_token_usage' to be called once. Called 0 times.
 
+----------------------------------------------------------------------
+Ran 43 tests in 32.095s
+
+FAILED (failures=1)

@@ -3,13 +3,39 @@
 3. Application Security Review
 4. Error collection & handling for the user, collect document_contents, and update_requests in order to fine-tune/embed
 5. get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
-
-
+force json response
+Application Security
 
 Continue to prompt engineer for 10 edge cases.
 
+Create:
+requirements.txt
 
+Application Security:
+NGROK_DOMAIN replaced
+TODO'salesforce
+Ensure no hardcoding of sensitive info
+Credentials Handling:
+ensure HTTPS and secret key
+Storing and retrieving Google credentials in the session is mentioned. It's crucial that these credentials are not exposed to the client side or logged inappropriately. Ensure that any operation involving credentials is performed server-side and that logs are sanitized to avoid inadvertently logging sensitive information.
+Credentials Handling:
 
+Storing and retrieving Google credentials in the session is mentioned. It's crucial that these credentials are not exposed to the client side or logged inappropriately. Ensure that any operation involving credentials is performed server-side and that logs are sanitized to avoid inadvertently logging sensitive information.
+Session Security:
+
+Ensure your Flask application is configured to use a secure, randomly generated session secret key. Flask sessions are signed, but not encrypted, so sensitive information should not be stored directly in session variables. If you're storing the entire credentials object in the session, consider the security implications and possibly storing only non-sensitive parts or references.
+HTTPS Enforcement:
+
+Your OAuth callback URI should be using HTTPS to ensure that all communications between the client, your server, and Google's servers are encrypted. This is especially important for OAuth flows to prevent MITM attacks.
+Database Storage of Credentials:
+
+While you mentioned storing credentials in a database, ensure that the storage mechanism is secure. Use encryption for stored credentials and secure access to the database. It's not clear from the provided code how credentials are stored or retrieved from the database, but ensure that database queries are protected against SQL injection attacks.
+Recommendations
+Session Management: Use Flask's session management securely by configuring a strong secret key and ensuring sessions are transmitted over HTTPS.
+Secure Storage: If credentials must be stored, use encryption both at rest and in transit. Consider using a secure vault for storing sensitive information.
+Code Reviews and Testing: Conduct security reviews and testing specifically focused on authentication flows, session management, and data handling.
+Security Headers: Implement security headers like Content-Security-Policy, X-Content-Type-Options, Strict-Transport-Security, and others to enhance the security of your web application.
+Logging and Monitoring: Set up logging and monitoring for authentication processes to detect and respond to suspicious activities quickly.
 
 last 10 examples as 10-hot
 User feedback

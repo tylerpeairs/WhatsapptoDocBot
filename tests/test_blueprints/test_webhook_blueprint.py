@@ -2,7 +2,7 @@ import unittest
 from flask import Flask, jsonify
 from flask.testing import FlaskClient
 from unittest.mock import patch
-from app.flask_blueprints.webhook_blueprint import handle_message
+from app.blueprints.webhook_blueprint import handle_message
 import json
 
 class TestHandleMessage(unittest.TestCase):

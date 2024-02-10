@@ -1,7 +1,6 @@
 # This file contains the functions to create a new Google Docs document, get the content of a Google Docs document, and batch update a Google Docs document.
 
 # Import the required modules
-from calendar import c
 from googleapiclient.discovery import build
 from datetime import datetime
 

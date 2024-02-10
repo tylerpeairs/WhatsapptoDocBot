@@ -53,8 +53,8 @@ def create_app():
 # Import blueprints to register
 def register_blueprints(app):
     # Import blueprints
-    from .flask_blueprints.webhook_blueprint import webhook_blueprint
-    from .flask_blueprints.oauth_blueprint import oauth_blueprint
+    from .blueprints.webhook_blueprint import webhook_blueprint
+    from .blueprints.oauth_blueprint import oauth_blueprint
 
     # Register blueprints
     app.register_blueprint(webhook_blueprint)
