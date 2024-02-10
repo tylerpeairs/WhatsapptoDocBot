@@ -15,6 +15,7 @@ last 10 examples as 10-hot
 User feedback
 User added categorization
 Delete
+Can use text generation for list of categories then add that to a zero-shot classifier
 
 
 

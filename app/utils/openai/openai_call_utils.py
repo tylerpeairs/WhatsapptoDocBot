@@ -19,25 +19,9 @@ def generate_response(body, document_content):
     doc_categories = list(doc_categories_indexed.keys())
     #logging.info(f"Document Categories: {doc_categories}")
 
-    # Generate a user message
-    message_and_categorization_input_content = {
-        "whatsapp_text_message": message_body,
-        "categories": doc_categories
-    }
-    #logging.info(f"Message and Categorization Input Content: {message_and_categorization_input_content}")
-
     # Generate a readable message with a category
     string_message_and_categorization_input_content = f"whatsapp_text_message: {message_body}\ncategories: {'None' if not doc_categories else ', '.join(doc_categories)}"
     message, categorization = generate_message_and_categorization(string_message_and_categorization_input_content)
     
 
     return message, categorization
-
-
-# To-do
-# Generate and test the generate_json_prompt with output test cases use function calling tool for responses format response_format={ "type": "json_object" }
-# Build generate_json_prompt function
-# Add Output Validators & Try/Catch for json_request (Could even use an output validation model)
-# Call json_request with batch_update_google_docs_document function
-# Format whatsapp message according to outputs
-# Token Storage

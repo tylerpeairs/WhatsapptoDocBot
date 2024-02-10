@@ -1,8 +1,1 @@
-Category: New Category
-Text: Some text
-End index of last paragraph: 24
-Category insert index: 23
-Text insert index: 37
-Update requests: [{'insertText': {'location': {'index': 23}, 'text': '\nNew Category\n'}}, {'updateParagraphStyle': {'range': {'startIndex': 23, 'endIndex': 37}, 'paragraphStyle': {'namedStyleType': 'HEADING_1'}, 'fields': 'namedStyleType'}}, {'insertText': {'location': {'index': 37}, 'text': 'Some text\n'}}, {'updateParagraphStyle': {'range': {'startIndex': 37, 'endIndex': 47}, 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT'}, 'fields': 'namedStyleType'}}]
-FCategory: Real Estate Transactions
 

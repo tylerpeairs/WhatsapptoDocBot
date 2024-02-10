@@ -87,7 +87,6 @@ def create_update_requests(doc_content, category, text):
     # Get end index of the last paragraph
     def find_insertion_index(existing_categories, category_name, doc_content):
         category_names = list(existing_categories.keys())
-        print(existing_categories)
 
         if category_name in existing_categories:
             category_index = category_names.index(category_name)

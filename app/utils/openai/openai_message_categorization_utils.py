@@ -71,7 +71,6 @@ def generate_message_and_categorization(message_and_categorization_input_content
         "content": message_and_categorization_input_content
         }
     ]
-    logging.info(f"Messages: {messages}")
     attempts = 0
     while attempts <= max_attempts:
         try:
@@ -96,6 +95,8 @@ def generate_message_and_categorization(message_and_categorization_input_content
             logging.error(f"Error: {e}")
             attempts += 1
             time.sleep(5)
+
+    return None, None
 
 # Function to validate and parse the messaging categorization
 def validate_and_parse_messaging_categorization(response):

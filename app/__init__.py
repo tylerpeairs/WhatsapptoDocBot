@@ -10,7 +10,9 @@ from .config import load_configurations, configure_logging
 from .extensions import db
 
 #Import Flask and the database
-from flask import Flask, redirect, request, session, url_for, json, render_template
+from flask import Flask, redirect, request, session, url_for, json, render_template, jsonify
+
+from werkzeug.exceptions import BadRequest
 
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #TODO bypass https requirement (REMOVE FOR PROD)
@@ -23,6 +25,13 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Set a consistent secret key
     app.config['SECRET_KEY'] = 'a_secret_key'
+
+    @app.errorhandler(BadRequest)
+    def handle_bad_request(e):
+        if request.content_type == 'application/json':
+            # This assumes the BadRequest was due to JSON parsing
+            return jsonify({"status": "error", "message": "Invalid JSON provided"}), 400
+        return e.get_response()
 
     
     # Load configurations and logging settings

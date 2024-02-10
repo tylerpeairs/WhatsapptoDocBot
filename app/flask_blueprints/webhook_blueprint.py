@@ -3,7 +3,6 @@
 # Import the required modules
 import logging
 import json
-from dotenv import load_dotenv
 import os
 from flask import Blueprint, request, jsonify, current_app
 
@@ -19,7 +18,7 @@ from ..utils.whatsapp_utils import (
 # Load the environment variables
 webhook_blueprint = Blueprint("webhook", __name__)
 
-
+@webhook_blueprint.route('/webhook', methods=['POST'])
 def handle_message():
     """
     Handle incoming webhook events from the WhatsApp API.
@@ -35,9 +34,8 @@ def handle_message():
         response: A tuple containing a JSON response and an HTTP status code.
     """
     body = request.get_json()
-    # logging.info(f"request body: {body}")
-
-    # Check if it's a WhatsApp status update
+        # logging.info(f"request body: {body}")
+        # Check if it's a WhatsApp status update
     if (
         body.get("entry", [{}])[0]
         .get("changes", [{}])[0]
@@ -47,19 +45,15 @@ def handle_message():
         logging.info("Received a WhatsApp status update.")
         return jsonify({"status": "ok"}), 200
 
-    try:
-        if is_valid_whatsapp_message(body):
-            process_whatsapp_message(body)
-            return jsonify({"status": "ok"}), 200
-        else:
-            # if the request is not a WhatsApp API event, return an error
-            return (
-                jsonify({"status": "error", "message": "Not a WhatsApp API event"}),
-                404,
-            )
-    except json.JSONDecodeError:
-        logging.error("Failed to decode JSON")
-        return jsonify({"status": "error", "message": "Invalid JSON provided"}), 400
+    if is_valid_whatsapp_message(body):
+        process_whatsapp_message(body)
+        return jsonify({"status": "ok"}), 200
+    else:
+        # if the request is not a WhatsApp API event, return an error
+        return (
+            jsonify({"status": "error", "message": "Not a WhatsApp API event"}),
+            404,
+        )
 
 
 # Required webhook verificaion for WhatsApp

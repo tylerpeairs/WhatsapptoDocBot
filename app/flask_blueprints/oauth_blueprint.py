@@ -26,38 +26,36 @@ def index():
     # Get the credentials from the session
     credentials = get_credentials_from_session(session)
     
-    # Check if the user has been authenticated
-    if session.get('authenticated'):
-        # Display a success message
-        wa_id = session.get('wa_id')
-        print(f"wa_id at index: {session.get('wa_id')}")
-        if wa_id:
-            # Check if the user has a document
-            if get_most_recent_document(wa_id) is None:
-                # Create a new Google Doc
-                document_details = create_google_docs_document(credentials)
-                # Extract document_id and document_title from the returned dictionary
-                document_id = document_details['document_id']
-                document_title = document_details['document_title']
-                # Store the document details in the database
-                store_document_details(wa_id, document_title, document_id)
-            else:
-                # Get the most recent document
-                document = get_most_recent_document(wa_id)
-                print(f"Most recent document: {document}")
-                document_title = document['title']
-                document_id = document['document_id']
-            # Prepare the success message
-            success_message = f"Your most recent document is {document_title}. You can access it here: https://docs.google.com/document/d/{document_id}/edit. Message me to add more information."
-            success_message_data = get_text_message_input(wa_id, success_message)
-            send_message(success_message_data)
-            return render_template('index.html', message="You have successfully authenticated Whatsapp to Doc Bot!")
+    wa_id = session.get('wa_id')
+    if wa_id:
+        print(f"wa_id: {wa_id}")   
+        document = get_most_recent_document(wa_id)
+        print(f"Most recent document: {document}")
+        if not document:
+            print("No document found")
+            credentials = get_credentials_from_session(session)
+            document_details = create_google_docs_document(credentials)
+            document_id = document_details['document_id']
+            document_title = document_details['document_title']
+            # Store document details and send message logic here...
+            store_document_details(wa_id, document_title, document_id)
+
         else:
-            print(f"WA_ID not being passed")  # Debug print
-            return redirect(url_for('oauth.login'))
+            # Get the most recent document
+            document = get_most_recent_document(wa_id)
+            print(f"Most recent document: {document}")
+            document_title = document['title']
+            document_id = document['document_id']
     else:
-        # Send the user to login if not authenticated
+        # Send the user to login if no wa_id is found
         return redirect(url_for('oauth.login'))
+    
+    # Send a message to the user
+            # Prepare the success message
+    success_message = f"Your most recent document is {document_title}. You can access it here: https://docs.google.com/document/d/{document_id}/edit. Message me to add more information."
+    success_message_data = get_text_message_input(wa_id, success_message)
+    send_message(success_message_data)
+    return render_template('index.html', message="You have successfully authenticated Whatsapp to Doc Bot!")
 
 
 

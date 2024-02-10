@@ -1,12 +1,11 @@
 # Description: This file contains the utility functions for Google OAuth 2.0
 
 # Import the required modules
-from flask import request, session
+from flask import session
 import json
 import os
 import secrets
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
 
 # Import the required Google OAuth 2.0 modules
 from google_auth_oauthlib.flow import Flow
