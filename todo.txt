@@ -1,55 +1,74 @@
-1. Collect token counts per user
-2. Build test directories and cases, Use chatgpt to generate more prompt engingeering & function Tests, automated testing suite, add embeddings/fine-tun for classification
-3. Application Security Review
-4. Error collection & handling for the user, collect document_contents, and update_requests in order to fine-tune/embed
-5. get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
-force json response
-Application Security
-
-Continue to prompt engineer for 10 edge cases.
-
-Create:
+6. Application Security edits
+7. Create:
 requirements.txt
+8. Fix messaging readability for oauath/doc
+9. Trailing newline problems
 
-Application Security:
-NGROK_DOMAIN replaced
-TODO'salesforce
-Ensure no hardcoding of sensitive info
-Credentials Handling:
-ensure HTTPS and secret key
-Storing and retrieving Google credentials in the session is mentioned. It's crucial that these credentials are not exposed to the client side or logged inappropriately. Ensure that any operation involving credentials is performed server-side and that logs are sanitized to avoid inadvertently logging sensitive information.
-Credentials Handling:
+10. collect last 10 messages from user (embed for application security - can you fine-tune with embeddings)?
 
-Storing and retrieving Google credentials in the session is mentioned. It's crucial that these credentials are not exposed to the client side or logged inappropriately. Ensure that any operation involving credentials is performed server-side and that logs are sanitized to avoid inadvertently logging sensitive information.
-Session Security:
 
-Ensure your Flask application is configured to use a secure, randomly generated session secret key. Flask sessions are signed, but not encrypted, so sensitive information should not be stored directly in session variables. If you're storing the entire credentials object in the session, consider the security implications and possibly storing only non-sensitive parts or references.
-HTTPS Enforcement:
-
-Your OAuth callback URI should be using HTTPS to ensure that all communications between the client, your server, and Google's servers are encrypted. This is especially important for OAuth flows to prevent MITM attacks.
-Database Storage of Credentials:
-
-While you mentioned storing credentials in a database, ensure that the storage mechanism is secure. Use encryption for stored credentials and secure access to the database. It's not clear from the provided code how credentials are stored or retrieved from the database, but ensure that database queries are protected against SQL injection attacks.
-Recommendations
-Session Management: Use Flask's session management securely by configuring a strong secret key and ensuring sessions are transmitted over HTTPS.
-Secure Storage: If credentials must be stored, use encryption both at rest and in transit. Consider using a secure vault for storing sensitive information.
-Code Reviews and Testing: Conduct security reviews and testing specifically focused on authentication flows, session management, and data handling.
-Security Headers: Implement security headers like Content-Security-Policy, X-Content-Type-Options, Strict-Transport-Security, and others to enhance the security of your web application.
-Logging and Monitoring: Set up logging and monitoring for authentication processes to detect and respond to suspicious activities quickly.
-
+========================================================================
+Prompt Engineering:
+force json response and try 3.5 turbo
+Continue to prompt engineer for 10 edge cases.
 last 10 examples as 10-hot
 User feedback
 User added categorization
 Delete
 Can use text generation for list of categories then add that to a zero-shot classifier
-
-
-
-
-
-
+========================================================================
 Nice to have:
+Document Creation query for name
 Tests for longer text strings
 Add speach-to-text processing
 salesforce & notion & airtable connections
 assistant model with message threads for categorization recommendations
+========================================================================
+Application Security
+
+database.py
+The database is encrypted at rest. This means even if someone were to gain physical access to the database storage, the data would be encrypted.
+Use environment-specific encryption keys and manage them securely (e.g., using a secrets manager).
+HTTPS
+Check logs & prints
+Does error handling in credentials reveal them?
+Secure session management
+secure credential transmission (storage)
+
+oauth utils:
+implement try/catch without putting credentials in the error message
+
+doc utils:
+Try/catch around api callls
+try:
+    # Google Docs API call
+except googleapiclient.errors.HttpError as e:
+    logging.error(f"API request failed: {e}")
+    # Handle the error appropriately
+
+Fix:
+Validate inputs before using them in API calls or processing. For example, check if document_id follows the expected format or if update_requests contains valid requests.
+
+if not isinstance(document_id, str) or not document_id.startswith("expected_prefix"):
+    raise ValueError("Invalid document ID")
+
+7. Potential Cross-site Scripting (XSS) in Web Applications:
+If any document content retrieved from the Google Docs API is displayed in a web application, there's a risk of XSS if the content is not properly sanitized before rendering.
+
+Fix:
+Always sanitize and escape user-generated content before rendering it in web applications. Use template engines that automatically escape values or apply appropriate content security policies.
+
+oauth_blueprint:
+3. Error Handling and User Feedback
+Vulnerability: Lack of detailed error handling and user feedback, especially in the OAuth callback function, can leave users confused about the authentication process's status.
+
+Fix:
+
+Provide clear error messages and user feedback throughout the OAuth flow, especially if state validation fails or if other errors occur. Use flash messages or a dedicated error template to communicate issues to the user.
+Vulnerability: Using print statements for debugging purposes, especially in production, is not recommended. It can clutter log files and potentially expose sensitive information.
+
+Fix:
+
+Validate wa_id and other inputs rigorously before using them. Ensure they meet expected formats and sanitize them to prevent injection attacks or unintended behavior.
+
+

@@ -2,8 +2,6 @@
 
 # Import the required modules
 import logging
-import json
-import os
 from flask import Blueprint, request, jsonify, current_app
 
 # Import security decorators
@@ -34,7 +32,6 @@ def handle_message():
         response: A tuple containing a JSON response and an HTTP status code.
     """
     body = request.get_json()
-        # logging.info(f"request body: {body}")
         # Check if it's a WhatsApp status update
     if (
         body.get("entry", [{}])[0]
@@ -50,8 +47,9 @@ def handle_message():
         return jsonify({"status": "ok"}), 200
     else:
         # if the request is not a WhatsApp API event, return an error
+        logging.info("Not a WhatsApp API event")
         return (
-            jsonify({"status": "error", "message": "Not a WhatsApp API event"}),
+            jsonify({"status": "error", "message": "Cannot process message."}),
             404,
         )
 
@@ -72,14 +70,13 @@ def verify():
         else:
             # Responds with '403 Forbidden' if verify tokens do not match
             logging.info("VERIFICATION_FAILED")
-            return jsonify({"status": "error", "message": "Verification failed"}), 403
+            return jsonify({"status": "error", "message": "Issues processing message"}), 403
     else:
         # Responds with '400 Bad Request' if verify tokens do not match
         logging.info("MISSING_PARAMETER")
-        return jsonify({"status": "error", "message": "Missing parameters"}), 400
+        return jsonify({"status": "error", "message": "Issues processing message"}), 400
 
 # Define the routes for getting the webhook
-@webhook_blueprint.route("/webhook", methods=["GET"])
 def webhook_get():
     return verify()
 

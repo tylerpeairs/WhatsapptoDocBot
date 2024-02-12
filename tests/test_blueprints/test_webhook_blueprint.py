@@ -72,7 +72,7 @@ class TestHandleMessage(unittest.TestCase):
         with self.app.test_request_context(json={'event': 'invalid_event'}):
             response, status_code = handle_message()
             self.assertEqual(status_code, 404)
-            self.assertEqual(response.get_json(), {'status': 'error', 'message': 'Not a WhatsApp API event'})
+            self.assertEqual(response.get_json(), {'status': 'error', 'message': 'Cannot process message.'})
 
             # Add additional assertions for the expected behavior when handling an invalid WhatsApp event
 

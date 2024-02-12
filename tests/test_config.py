@@ -15,7 +15,6 @@ class TestConfig(unittest.TestCase):
         os.environ["YOUR_PHONE_NUMBER"] = "mock_phone_number"
         os.environ["APP_ID"] = "mock_app_id"
         os.environ["APP_SECRET"] = "mock_app_secret"
-        os.environ["RECIPIENT_WAID"] = "mock_recipient_waid"
         os.environ["VERSION"] = "mock_version"
         os.environ["PHONE_NUMBER_ID"] = "mock_phone_number_id"
         os.environ["VERIFY_TOKEN"] = "mock_verify_token"
@@ -27,7 +26,6 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(app.config["YOUR_PHONE_NUMBER"], "mock_phone_number")
         self.assertEqual(app.config["APP_ID"], "mock_app_id")
         self.assertEqual(app.config["APP_SECRET"], "mock_app_secret")
-        self.assertEqual(app.config["RECIPIENT_WAID"], "mock_recipient_waid")
         self.assertEqual(app.config["VERSION"], "mock_version")
         self.assertEqual(app.config["PHONE_NUMBER_ID"], "mock_phone_number_id")
         self.assertEqual(app.config["VERIFY_TOKEN"], "mock_verify_token")

@@ -13,7 +13,6 @@ import json
 # Import OAuth2Credentials
 from google.oauth2.credentials import Credentials
 
-
 # Get user credentials
 def get_user_credentials(wa_id):
     # Query the user by wa_id along with their credentials

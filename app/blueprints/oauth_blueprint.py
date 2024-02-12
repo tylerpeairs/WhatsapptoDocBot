@@ -1,9 +1,7 @@
 # This file contains the blueprint for the OAuth flow
 
 # Import the required libraries
-from turtle import st
 from flask import Blueprint, session, redirect, url_for, render_template, request
-from httpx import get
 from app.utils.google_oauth_utils import get_credentials_from_session, get_authorization_url, CLIENT_CONFIG, SCOPES
 from app.utils.whatsapp_utils import send_message, get_text_message_input
 from app.database import store_document_details, store_user_credentials, get_most_recent_document
@@ -28,11 +26,8 @@ def index():
     
     wa_id = session.get('wa_id')
     if wa_id:
-        print(f"wa_id: {wa_id}")   
         document = get_most_recent_document(wa_id)
-        print(f"Most recent document: {document}")
         if not document:
-            print("No document found")
             credentials = get_credentials_from_session(session)
             document_details = create_google_docs_document(credentials)
             document_id = document_details['document_id']
@@ -43,7 +38,6 @@ def index():
         else:
             # Get the most recent document
             document = get_most_recent_document(wa_id)
-            print(f"Most recent document: {document}")
             document_title = document['title']
             document_id = document['document_id']
     else:
@@ -73,7 +67,6 @@ def login():
 
     # Explicitly save the session if necessary
     session.modified = True
-    print(f"Session after setting state: {session}")  # Debug print
 
     return redirect(authorization_url)
 

@@ -53,7 +53,7 @@ whatsapp_text_message: "Finished testing functions in program"
 categories: "Personal, Legal, Money Received, Real Estate"
 Example 3 Output:
 Message: "Finished testing functions in program."
-Category: Computer Programming
+Category: Computer Programdg
 
 # Output Format
 Message: 
@@ -87,7 +87,8 @@ def generate_message_and_categorization(wa_id, message_and_categorization_input_
                 presence_penalty=0
             )
             validated_response = validate_and_parse_messaging_categorization(response)
-            token_count += response.usage['total_tokens']
+            logging.info(f"Response: {response}")
+            token_count += response.usage.total_tokens
             logging.info(f"Validated Response: {validated_response}")
             if validated_response[0] == True:
                 logging.info(f"Token Count: {token_count}")

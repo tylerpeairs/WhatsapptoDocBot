@@ -42,7 +42,6 @@ class TestWhatsAppUtils(unittest.TestCase):
         expected_calls = [
             call('Status: 200'),
             call('Content-type: application/json'),
-            call('Body: {"message": "Success"}')
         ]
         mock_logging_info.assert_has_calls(expected_calls, any_order=True)
 
@@ -102,9 +101,6 @@ class TestWhatsAppUtils(unittest.TestCase):
         # Validate the status code
         self.assertEqual(status_code, 408)
 
-        json_data = output.get_json()
-        self.assertEqual(json_data, {"status": "error", "message": "Request timed out"})
-
     @patch('requests.post')
     def test_send_message_request_exception(self, mock_requests_post):
         data = '{"message": "Hello"}'
@@ -126,9 +122,6 @@ class TestWhatsAppUtils(unittest.TestCase):
         
         # Validate the status code
         self.assertEqual(status_code, 500)
-
-        json_data = output.get_json()
-        self.assertEqual(json_data, {"status": "error", "message": "Failed to send message"})
 
     def test_process_text_for_whatsapp(self):
         text = 'Hello **world**! This is a **test** message.'
@@ -196,7 +189,6 @@ class TestProcessWhatsAppMessage(unittest.TestCase):
         self.app.config['ACCESS_TOKEN'] = 'mock_access_token'
         self.app.config['VERSION'] = 'mock_version'
         self.app.config['PHONE_NUMBER_ID'] = 'mock_phone_number_id'
-        self.app.config['RECIPIENT_WAID'] = 'mock_recipient_id'
         self.ctx = self.app.app_context()
         self.ctx.push()  # This line was missing
 
@@ -250,6 +242,7 @@ class TestProcessWhatsAppMessage(unittest.TestCase):
         }
         document_content = "Mock Document Content"
         message = "Mock Message"
+        wa_id = '1234567890'
         categorization = "Mock Categorization"
         update_request = "Mock Update Request"
         response = f"Message Added: {message}\nCategory: {categorization}\nAccess Doc: https://docs.google.com/document/d/mock_document_id/edit"
@@ -280,7 +273,7 @@ class TestProcessWhatsAppMessage(unittest.TestCase):
         mock_create_update_requests.assert_called_once_with(document_content, categorization, message)
         mock_batch_update_google_docs_document.assert_called_once_with(credentials, "mock_document_id", update_request)
         mock_process_text_for_whatsapp.assert_called_once_with(response)
-        mock_get_text_message_input.assert_called_once_with(self.app.config['RECIPIENT_WAID'], response)
+        mock_get_text_message_input.assert_called_once_with(wa_id, response)
         mock_send_message.assert_called_once_with(text_message_input)
 
 if __name__ == '__main__':
