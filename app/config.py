@@ -26,6 +26,7 @@ def load_configurations(app):
     app.config['APP_DOMAIN'] = 'https://deciding-werewolf-infinitely.ngrok-free.app'
 
 
+
 # Set up the logging
 def configure_logging():
     logging.basicConfig(

@@ -1,86 +1,53 @@
-# This file is used to create the database object that will be used to interact with the database
-
-# Import the required modules
-import logging
-
-# Import models
-from .models import User, Document
+import hashlib
 from .extensions import db
+from .models import User, Document
 
-# Import JSON
-import json
+def generate_hash(value):
+    """Generate a SHA-256 hash of the given value."""
+    return hashlib.sha256(value.encode()).hexdigest()
 
-# Import OAuth2Credentials
-from google.oauth2.credentials import Credentials
-
-# Get user credentials
 def get_user_credentials(wa_id):
-    # Query the user by wa_id along with their credentials
-    logging.debug(f"Querying for user with wa_id: {wa_id}")
-    user = User.query.filter_by(wa_id=wa_id).first()
-    if user:
-        logging.debug(f"User found with wa_id: {wa_id}")
-        # User exists and has associated credentials
-        unserialized_credentials = json.loads(user.serialized_credentials)
-        return Credentials.from_authorized_user_info(unserialized_credentials)
-    else:
-        # User does not exist
-        logging.debug(f"No user found with wa_id: {wa_id}")
-        return None
+    wa_id_hash = generate_hash(wa_id)
+    user = User.query.filter_by(wa_id_hash=wa_id_hash).first()
+    return user.credentials if user else None
 
-# Store user credentials
 def store_user_credentials(wa_id, credentials):
-
-    # Query the user by wa_id
-    logging.debug(f"Querying for user with wa_id: {wa_id}")
-    user = User.query.filter_by(wa_id=wa_id).first()
-
-    if user:
-        # User exists, update their credentials
-        logging.debug(f"User found with wa_id: {wa_id}, updating credentials")
-        user.serialized_credentials = credentials.to_json()
-    else:
-        # User does not exist, create a new user
-        logging.debug(f"No user found with wa_id: {wa_id}, creating new user")
-        user = User(wa_id=wa_id, serialized_credentials=credentials.to_json())
+    wa_id_hash = generate_hash(wa_id)
+    user = User.query.filter_by(wa_id_hash=wa_id_hash).first()
+    if not user:
+        user = User(wa_id=wa_id, wa_id_hash=wa_id_hash)
         db.session.add(user)
-
-    # Commit the changes to the database
+    user.credentials = credentials
     db.session.commit()
-    logging.debug(f"Stored credentials for user with wa_id: {wa_id}")
-        
 
-
-# Store document details after uAsing Google Docs API create call. user_id will be wa_id
 def store_document_details(user_id, title, document_id):
-    # Create a new Document instance with the provided details
-    new_document = Document(user_id=user_id, title=title, document_id=document_id)
-    
-    # Add the new document to the session and commit it to the database
-    db.session.add(new_document)
-    db.session.commit()
-    
-    print(f"Document {title} with ID {document_id} stored in database.")
-
-# Get the document details from the database using the wa_id
-def get_most_recent_document(user_id):
-    # Query the Document table for the most recent document related to the user_id
-    document = Document.query.filter_by(user_id=user_id).order_by(Document.created_at.desc()).first()
-
-    # If a document is found, prepare the details
-    if document:
-        document_details = {
-            'title': document.title,
-            'document_id': document.document_id,
-            'created_at': document.created_at  # Optionally include the creation timestamp
-        }
-        return document_details
+    wa_id_hash = generate_hash(user_id)
+    user = User.query.filter_by(wa_id_hash=wa_id_hash).first()
+    if user:
+        new_document = Document(user_id=user.id, title=title, document_id=document_id)
+        db.session.add(new_document)
+        db.session.commit()
     else:
-        # Return None or an appropriate message if no document is found
-        return None
-    
-# Update token usage
+        return "User not found."
+
+def get_most_recent_document(user_id):
+    wa_id_hash = generate_hash(user_id)
+    user = User.query.filter_by(wa_id_hash=wa_id_hash).first()
+    if user:
+        document = Document.query.filter_by(user_id=user.id).order_by(Document.created_at.desc()).first()
+        if document:
+            return {
+                'title': document.title,
+                'document_id': document.document_id,
+                'created_at': document.created_at.isoformat()
+            }
+    return None
+
 def update_token_usage(wa_id, usage):
-    user = User.query.filter_by(wa_id=wa_id).first()
-    user.token_usage += usage
-    db.session.commit()
+    wa_id_hash = generate_hash(wa_id)
+    user = User.query.filter_by(wa_id_hash=wa_id_hash).first()
+    if user:
+        user.token_usage = user.token_usage + usage if user.token_usage else usage
+        db.session.commit()
+    else:
+        print("User not found.")

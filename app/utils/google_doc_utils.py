@@ -1,62 +1,111 @@
 # This file contains the functions to create a new Google Docs document, get the content of a Google Docs document, and batch update a Google Docs document.
 
 # Import the required modules
+import logging
 from googleapiclient.discovery import build
 from datetime import datetime
+from googleapiclient.errors import HttpError
+from google.auth.exceptions import GoogleAuthError
 
 # Create a new Google Docs document
 def create_google_docs_document(credentials):
-    # Get today's date in the desired format (e.g., YYYY-MM-DD)
-    today_date = datetime.now().strftime('%Y-%m-%d')
+    try:
+        # Get today's date in the desired format (e.g., YYYY-MM-DD)
+        today_date = datetime.now().strftime('%Y-%m-%d')
 
-    # Combine "Whatsapp Notes" with today's date
-    document_title = f"Whatsapp Notes {today_date}"
-    
-    # Build the Google Docs service
-    service = build('docs', 'v1', credentials=credentials)
-    
-    # The body of the request containing the document title
-    document = {
-        'title': document_title
-    }
-    
-    # Use the Google Docs service to create a new document
-    doc = service.documents().create(body=document).execute()
-    
-    # Print the created document ID
-    print(f"Created document with ID: {doc['documentId']}")
-    
-    # Return the document ID and title in a dictionary
-    return {'document_id': doc['documentId'], 'document_title': document_title}
+        # Combine "Whatsapp Notes" with today's date
+        document_title = f"Whatsapp Notes {today_date}"
+        
+        # Build the Google Docs service
+        service = build('docs', 'v1', credentials=credentials)
+        
+        # The body of the request containing the document title
+        document = {
+            'title': document_title
+        }
+        
+        # Use the Google Docs service to create a new document
+        doc = service.documents().create(body=document).execute()
+                
+        # Return the document ID and title in a dictionary
+        return {'document_id': doc['documentId'], 'document_title': document_title}
+
+    except GoogleAuthError as auth_error:
+        # Handle authentication errors
+        logging.exception(f"Authentication error: {auth_error}")
+        return None
+
+    except HttpError as http_error:
+        # Handle HTTP errors from the API calls
+        logging.exception(f"HTTP error: {http_error}")
+        return None
+
+    except Exception as e:
+        # Handle any other unexpected errors
+        logging.exception(f"An unexpected error occurred: {e}")
+        return None
 
 # Get the content of a Google Docs document
 def get_google_doc_content(credentials, document_id):
-    # Build the Google Docs service
-    service = build('docs', 'v1', credentials=credentials)
-    
+    if not isinstance(document_id, str):
+        raise ValueError("Invalid document ID")
     try:
+        # Build the Google Docs service
+        service = build('docs', 'v1', credentials=credentials)
+        
         # Use the Google Docs service to get the specified document by ID
         document = service.documents().get(documentId=document_id).execute()
         doc_content = document.get('body').get('content')
-        # Return the document object
+        
+        # Return the document content
         return doc_content
+
+    except GoogleAuthError as auth_error:
+        # Handle authentication errors
+        logging.exception(f"Authentication error: {auth_error}")
+        return None
+
+    except HttpError as http_error:
+        # Handle HTTP errors from the API calls
+        logging.exception(f"HTTP error: {http_error}")
+        return None
+
     except Exception as e:
+        # Handle any other unexpected errors
+        logging.exception(f"An unexpected error occurred: {e}")
         return None
     
 # Batch update a Google Docs document with specified update requests
 def batch_update_google_docs_document(credentials, document_id, update_requests):
-    # Build the Google Docs service
-    service = build('docs', 'v1', credentials=credentials)
-    
-    # Execute the batch update
-    result = service.documents().batchUpdate(
-        documentId=document_id,
-        body=update_requests
-    ).execute()
-    
-    # Print the result or return it for further processing
-    print(f"Batch update completed. Result: {result}")
-    return result
+    if not isinstance(document_id, str) or not isinstance(update_requests, dict):
+        raise ValueError("Invalid document ID or Update Requests")
+    try:
+        # Build the Google Docs service
+        service = build('docs', 'v1', credentials=credentials)
+        
+        # Execute the batch update
+        result = service.documents().batchUpdate(
+            documentId=document_id,
+            body=update_requests
+        ).execute()
+        
+        # logging.exception the result or return it for further processing
+        return result
+        
+    except GoogleAuthError as auth_error:
+        # Handle authentication errors
+        logging.exception(f"Authentication error: {auth_error}")
+        return None
+        
+    except HttpError as http_error:
+        # Handle HTTP errors from the API calls
+        logging.exception(f"HTTP error: {http_error}")
+        return None
+        
+    except Exception as e:
+        # Handle any other unexpected errors
+        logging.exception(f"An unexpected error occurred: {e}")
+        return None
 
 # Helper function to create an update request for inserting text
 def create_update_requests(doc_content, category, text):

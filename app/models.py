@@ -1,42 +1,61 @@
-# Description: This file contains the models for the database.
-
-# Import the required modules
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+from .extensions import db   
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
-from .extensions import db
-
+from sqlalchemy.sql.expression import func
+import os
+from google.oauth2.credentials import Credentials
+import json
 
 Base = declarative_base()
 
+def get_secret_key():
+    key = os.getenv('PGCRYPTO_KEY')
+    if not key:
+        raise ValueError("Secret key not set in environment variables")
+    return key
 
-# Create the User class
+# Utility functions for encryption and decryption
+def encrypt(expr):
+    """Encrypt an expression (value) with a secret key."""
+    secret_key = os.getenv('PGCRYPTO_KEY')  # Ensure you've set this environment variable
+    return func.pgp_sym_encrypt(expr, secret_key)
+
+def decrypt(column):
+    """Decrypt a column with a secret key."""
+    secret_key = os.getenv('PGCRYPTO_KEY')
+    return func.pgp_sym_decrypt(column, secret_key).label(column.name)
+
+
+
 class User(db.Model):
-    # Define the user table name
-    __tablename__ = 'users'
-    # Define the user table columns
-    id = Column(Integer, primary_key=True)
-    wa_id = Column(String, unique=True)  # WhatsApp ID
-    serialized_credentials = Column(Text)  # Store serialized Google credentials as a JSON string
-    thread_id = Column(String)  # OpenAI thread ID
-    token_usage = Column(Integer, default=0)  # Number of tokens used
 
+
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    wa_id = db.Column(db.Text, unique=True)  # Store WhatsApp ID directly without encryption
+    _serialized_credentials = db.Column('serialized_credentials', db.Text)  # Encrypted Google credentials
+    token_usage = db.Column('token_usage', db.Text)  # Encrypted token usage
+
+    @hybrid_property
+    def serialized_credentials(self):
+        if self._serialized_credentials:
+            decrypted_data = decrypt(self._serialized_credentials)
+            return json.loads(decrypted_data)
+        return None
+
+    @serialized_credentials.setter
+    def serialized_credentials(self, credentials):
+        self._serialized_credentials = encrypt(credentials.to_json())
+        
+
+    # Relationship to Document
+    documents = db.relationship('Document', backref='user', lazy=True)
 
 
 class Document(db.Model):
     __tablename__ = 'documents'
-    
-    # Columns
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    title = Column(String)
-    document_id = Column(String)
-    created_at = Column(DateTime, default=func.now())  # Timestamp of creation
-
-    
-    # Relationship to User
-    user = relationship("User", backref="documents")
-
-
-
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    title = db.Column(db.String)  # Assume title is not encrypted
+    document_id = db.Column('document_id', db.Text)  # Encrypted document ID
+    created_at = db.Column(db.DateTime, default=func.now())  # Timestamp of creation

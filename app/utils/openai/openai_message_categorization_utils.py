@@ -87,11 +87,8 @@ def generate_message_and_categorization(wa_id, message_and_categorization_input_
                 presence_penalty=0
             )
             validated_response = validate_and_parse_messaging_categorization(response)
-            logging.info(f"Response: {response}")
             token_count += response.usage.total_tokens
-            logging.info(f"Validated Response: {validated_response}")
             if validated_response[0] == True:
-                logging.info(f"Token Count: {token_count}")
                 update_token_usage(wa_id, token_count)
                 return validated_response[1], validated_response[2]
             else:

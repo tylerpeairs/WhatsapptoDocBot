@@ -23,8 +23,7 @@ def create_app():
     
     # Create a Flask app
     app = Flask(__name__)
-    app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Set a consistent secret key
-    app.config['SECRET_KEY'] = 'a_secret_key'
+    app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Set a consistent secret key for session management
 
     @app.errorhandler(BadRequest)
     def handle_bad_request(e):
@@ -38,7 +37,7 @@ def create_app():
     load_configurations(app)
     configure_logging()
 
-    # Set up the database
+    # Set up the database  
     db.init_app(app)
 
     # Import models here to ensure they are known to SQLAlchemy

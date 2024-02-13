@@ -1,11 +1,5 @@
-6. Application Security edits
-7. Create:
-requirements.txt
-8. Fix messaging readability for oauath/doc
 9. Trailing newline problems
-
 10. collect last 10 messages from user (embed for application security - can you fine-tune with embeddings)?
-
 
 ========================================================================
 Prompt Engineering:
@@ -24,51 +18,3 @@ Add speach-to-text processing
 salesforce & notion & airtable connections
 assistant model with message threads for categorization recommendations
 ========================================================================
-Application Security
-
-database.py
-The database is encrypted at rest. This means even if someone were to gain physical access to the database storage, the data would be encrypted.
-Use environment-specific encryption keys and manage them securely (e.g., using a secrets manager).
-HTTPS
-Check logs & prints
-Does error handling in credentials reveal them?
-Secure session management
-secure credential transmission (storage)
-
-oauth utils:
-implement try/catch without putting credentials in the error message
-
-doc utils:
-Try/catch around api callls
-try:
-    # Google Docs API call
-except googleapiclient.errors.HttpError as e:
-    logging.error(f"API request failed: {e}")
-    # Handle the error appropriately
-
-Fix:
-Validate inputs before using them in API calls or processing. For example, check if document_id follows the expected format or if update_requests contains valid requests.
-
-if not isinstance(document_id, str) or not document_id.startswith("expected_prefix"):
-    raise ValueError("Invalid document ID")
-
-7. Potential Cross-site Scripting (XSS) in Web Applications:
-If any document content retrieved from the Google Docs API is displayed in a web application, there's a risk of XSS if the content is not properly sanitized before rendering.
-
-Fix:
-Always sanitize and escape user-generated content before rendering it in web applications. Use template engines that automatically escape values or apply appropriate content security policies.
-
-oauth_blueprint:
-3. Error Handling and User Feedback
-Vulnerability: Lack of detailed error handling and user feedback, especially in the OAuth callback function, can leave users confused about the authentication process's status.
-
-Fix:
-
-Provide clear error messages and user feedback throughout the OAuth flow, especially if state validation fails or if other errors occur. Use flash messages or a dedicated error template to communicate issues to the user.
-Vulnerability: Using print statements for debugging purposes, especially in production, is not recommended. It can clutter log files and potentially expose sensitive information.
-
-Fix:
-
-Validate wa_id and other inputs rigorously before using them. Ensure they meet expected formats and sanitize them to prevent injection attacks or unintended behavior.
-
-

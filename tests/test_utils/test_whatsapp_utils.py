@@ -245,6 +245,7 @@ class TestProcessWhatsAppMessage(unittest.TestCase):
         wa_id = '1234567890'
         categorization = "Mock Categorization"
         update_request = "Mock Update Request"
+        batch_updated = {'status': 'success'}
         response = f"Message Added: {message}\nCategory: {categorization}\nAccess Doc: https://docs.google.com/document/d/mock_document_id/edit"
         text_message_input = "Mock Text Message Input"
 
@@ -258,6 +259,7 @@ class TestProcessWhatsAppMessage(unittest.TestCase):
         mock_create_update_requests.return_value = update_request
         mock_process_text_for_whatsapp.return_value = response
         mock_get_text_message_input.return_value = text_message_input
+        mock_batch_update_google_docs_document.return_value = batch_updated
 
         # Call the function
         process_whatsapp_message(body)

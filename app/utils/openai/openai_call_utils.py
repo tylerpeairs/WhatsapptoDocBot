@@ -8,12 +8,10 @@ from .openai_message_categorization_utils import generate_message_and_categoriza
 def generate_response(wa_id, body, document_content):
     # Extract the message body
     message_body = body["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
-    #logging.info(f"Message Body: {message_body}")
 
     # Extract the categories from the document content
     doc_categories_indexed = parse_existing_categories(document_content)
     doc_categories = list(doc_categories_indexed.keys())
-    #logging.info(f"Document Categories: {doc_categories}")
 
     # Generate a readable message with a category
     string_message_and_categorization_input_content = f"whatsapp_text_message: {message_body}\ncategories: {'None' if not doc_categories else ', '.join(doc_categories)}"

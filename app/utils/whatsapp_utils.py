@@ -91,7 +91,7 @@ def process_whatsapp_message(body):
     # Check if the message was sent within the last minute
     if time_difference_in_minutes > 1:
         # If the message is older than 1 minutes, do not process it
-        print("Message is more than a minute old, not processing.") 
+        logging.info("Message is more than a minute old, not processing.") 
         return
     else:
         # Extract the user's WhatsApp ID and name
@@ -107,7 +107,7 @@ def process_whatsapp_message(body):
         if not credentials:
             # Use a configuration variable for the domain
             login_url = f"https://{current_app.config['APP_DOMAIN']}/login?number={wa_id}"
-            response = f"For me to create and update Google Docs, I will need you to authorize me to access your Google Docs. Please do this at {login_url}"
+            response = f"For me to create and update Google Docs, I will need authorization. Please do this at {login_url}"
         # If
         else:
             # Check if the user has a document
@@ -126,14 +126,16 @@ def process_whatsapp_message(body):
             
             message, categorization = generate_response(wa_id, body, document_content)
             update_request = create_update_requests(document_content, categorization, message)
-            batch_update_google_docs_document(credentials, document_id, update_request)
-
+            batch_updated = batch_update_google_docs_document(credentials, document_id, update_request)
+            logging.info(batch_updated)
             doc_link = f'https://docs.google.com/document/d/{document_id}/edit'
             whatsapp_response = 'Message Added: ' + message + '\nCategory: ' + categorization + '\nAccess Doc: ' + doc_link
             
             # Generate a response text message
-            response = process_text_for_whatsapp(whatsapp_response)
-
+            if batch_updated == {'status': 'success'}:
+                response = process_text_for_whatsapp(whatsapp_response)
+            else:
+                response = process_text_for_whatsapp('An error occurred while updating the document. Please try again later.')
 
        
 
