@@ -1,4 +1,3 @@
-9. Trailing newline problems
 10. collect last 10 messages from user (embed for application security - can you fine-tune with embeddings)?
 
 ========================================================================
@@ -18,3 +17,6 @@ Add speach-to-text processing
 salesforce & notion & airtable connections
 assistant model with message threads for categorization recommendations
 ========================================================================
+
+
+Push to Production

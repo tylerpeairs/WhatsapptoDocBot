@@ -132,13 +132,13 @@ def process_whatsapp_message(body):
                 logging.info("Batch update successful.")
                 doc_link = f'https://docs.google.com/document/d/{document_id}/edit'
                 whatsapp_response = 'Message Added: ' + message + '\nCategory: ' + categorization + '\nAccess Doc: ' + doc_link
-                
-                # Generate a response text message
-                response = process_text_for_whatsapp(whatsapp_response)
+
             else:
                 logging.error("Batch update failed.")
+                whatsapp_response = "An error occurred while updating the document. Please try again later."
 
-       
+    # Generate a response text message
+    response = process_text_for_whatsapp(whatsapp_response)
 
     # Prepare Whatsapp JSON and send the message
     data = get_text_message_input(wa_id, response)

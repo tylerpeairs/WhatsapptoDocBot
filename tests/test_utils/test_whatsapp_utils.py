@@ -245,7 +245,11 @@ class TestProcessWhatsAppMessage(unittest.TestCase):
         wa_id = '1234567890'
         categorization = "Mock Categorization"
         update_request = "Mock Update Request"
-        batch_updated = {'status': 'success'}
+        batch_updated = {
+        "replies": [
+            {}
+            ]
+        }
         response = f"Message Added: {message}\nCategory: {categorization}\nAccess Doc: https://docs.google.com/document/d/mock_document_id/edit"
         text_message_input = "Mock Text Message Input"
 

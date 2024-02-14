@@ -11,18 +11,27 @@
             align-items: center;
             height: 100vh;
             background-color: #f1f1f1;
+            flex-direction: column; /* Align items vertically */
+        }
+
+        .container {
+            text-align: center; /* Center the content of the div */
         }
 
         p, button {
-            text-align: center;
             color: green;
+            margin: 5px 0; /* Add some space between the paragraph and the button */
         }
     </style>
 </head>
 <body>
     {% if message %}
-        <p>{{ message }}</p>
-        <button onclick="window.close();">Close Tab</button>
+        <div class="container">
+            <p>{{ message }}</p>
+        </div>
+        <div class="container">
+            <button onclick="window.close();">Close Tab</button>
+        </div>
     {% endif %}
 </body>
 </html>
