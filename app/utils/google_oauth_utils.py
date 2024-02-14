@@ -1,7 +1,7 @@
 # Description: This file contains the utility functions for Google OAuth 2.0
 
 # Import the required modules
-from flask import session
+from flask import session, request
 import json
 import os
 import secrets
@@ -77,16 +77,26 @@ def get_authorization_url(client_config, scopes):
 
 def get_credentials_from_session(session):
     try:
+
+
         # Parse the JSON string in session['credentials'] back to a dictionary
-        credentials_dict = json.loads(session['credentials'])
+        credentials_dict = {
+            'token': session.get('credentials_token'),
+            'refresh_token': session.get('refresh_token'),
+            'token_uri': session.get('token_uri'),
+            'client_id': session.get('client_id'),
+            'client_secret': session.get('client_secret'),
+            'scopes': session.get('scopes')
+        }
         
+        logging.info(credentials_dict)
+
         # Attempt to create credentials object from the authorized user info
         credentials = Credentials.from_authorized_user_info(credentials_dict)
         
         # Check if credentials are valid, could add more checks here if needed
         if not credentials.valid:
-            raise GoogleAuthError("The credentials have expired or are invalid.")
-        
+            raise GoogleAuthError("The credentials have expired or are invalid.")        
         return credentials
     
     except GoogleAuthError as e:
@@ -105,4 +115,34 @@ def get_credentials_from_session(session):
         # Handle all other exceptions
         logging.exception(f"An unexpected error occurred: {e}")
 
+def fetch_token_and_store_in_session(client_config, scopes):
+    try:
+        # Create a new Flow instance
+        flow = Flow.from_client_config(
+            client_config=client_config,
+            scopes=scopes,
+            redirect_uri=client_config['web']['redirect_uris'][0]
+        )
 
+        # Assuming the authorization response is part of the current request URL
+        flow.fetch_token(authorization_response=request.url)
+
+        # Store the credentials in a secure server-side session or database
+        credentials = flow.credentials
+        session['credentials'] = credentials_to_dict(credentials)
+
+        logging.info(session['credentials'])
+
+
+    except Exception as e:
+        logging.info(f"An error occurred: {e}")
+    
+    return None
+
+def credentials_to_dict(credentials):
+    return {'token': credentials.token,
+            'refresh_token': credentials.refresh_token,
+            'token_uri': credentials.token_uri,
+            'client_id': credentials.client_id,
+            'client_secret': credentials.client_secret,
+            'scopes': credentials.scopes}

@@ -2,6 +2,7 @@
 
 #Import OS and Dotenv
 import os
+import dotenv
 
 #Import app configurations and logging settings
 from .config import load_configurations, configure_logging
@@ -14,16 +15,20 @@ from flask import Flask, redirect, request, session, url_for, json, render_templ
 
 from werkzeug.exceptions import BadRequest
 
+dotenv.load_dotenv()
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #TODO bypass https requirement (REMOVE FOR PROD)
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #TODO bypass https requirement (REMOVE FOR PROD)    
 
 # Create the app
-def create_app():
-
+def create_app(config_class=None):
     
     # Create a Flask app
     app = Flask(__name__)
     app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Set a consistent secret key for session management
+
+    if config_class:
+        app.config.from_object(config_class)  # Apply the configuration from the class
+
 
     @app.errorhandler(BadRequest)
     def handle_bad_request(e):

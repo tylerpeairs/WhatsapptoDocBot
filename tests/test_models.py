@@ -1,37 +1,44 @@
 import unittest
 import uuid
 import json
-from unittest.mock import patch
 from app.models import User, db
 from app import create_app
 
-# Mock functions for encryption and decryption removed as they're no longer needed for wa_id
+# Assuming TestConfig is meant for isolated test DB configuration
+class TestConfig:
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'  # Use an in-memory database for truly isolated tests
+    TESTING = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False  # Optional: Disable track modifications to suppress warning and slightly improve performance
 
 class TestUser(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.app = create_app()
+        cls.app = create_app(TestConfig)  # Assuming create_app can accept a config object
         cls.app_context = cls.app.app_context()
         cls.app_context.push()
         db.create_all()
 
     @classmethod
     def tearDownClass(cls):
+        # Instead of dropping all tables, just remove the session
         db.session.remove()
-        db.drop_all()
         cls.app_context.pop()
 
     def setUp(self):
         self.session = db.session
 
     def tearDown(self):
+        # Rollback the session to undo transactions
         self.session.rollback()
+        # Clear data from each table
+        for table in reversed(db.metadata.sorted_tables):
+            self.session.execute(table.delete())
+        self.session.commit()
 
     def test_user_creation(self):
         wa_id = str(uuid.uuid4())
         credentials_json = json.dumps({"access_token": "mock_token"})
 
-        # Note: _serialized_credentials encryption is mocked at a higher level, not in the test directly.
         user = User(wa_id=wa_id, _serialized_credentials=credentials_json)
         self.session.add(user)
         self.session.commit()
@@ -51,7 +58,6 @@ class TestUser(unittest.TestCase):
         user2 = User(wa_id=wa_id, _serialized_credentials='{"access_token": "token2"}')
         self.session.add(user2)
         
-        # Expecting an IntegrityError due to unique constraint on wa_id
         with self.assertRaises(Exception):
             self.session.commit()
 
@@ -62,7 +68,6 @@ class TestUser(unittest.TestCase):
         self.session.commit()
 
         retrieved_user = self.session.query(User).filter_by(wa_id=wa_id).first()
-        # Assuming token_usage defaults to 0 or similar logic, adjust as necessary
         self.assertEqual(retrieved_user.token_usage, None)  # Adjust based on actual default logic
 
 if __name__ == '__main__':

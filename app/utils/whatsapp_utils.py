@@ -96,17 +96,14 @@ def process_whatsapp_message(body):
     else:
         # Extract the user's WhatsApp ID and name
         wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
-
-
         # Check if User Exists and Get Their Credentials
         credentials = get_user_credentials(wa_id)
-    
 
 
         # If user credentials do not exist, prompt the user to login
         if not credentials:
             # Use a configuration variable for the domain
-            login_url = f"https://{current_app.config['APP_DOMAIN']}/login?number={wa_id}"
+            login_url = f"{current_app.config['APP_DOMAIN']}/login?number={wa_id}"
             response = f"For me to create and update Google Docs, I will need authorization. Please do this at {login_url}"
         # If
         else:

@@ -2,50 +2,58 @@ from .extensions import db
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.expression import func
+from dotenv import load_dotenv
 import os
-from google.oauth2.credentials import Credentials
 import json
+import logging
+from cryptography.fernet import Fernet
+import base64
 
+load_dotenv()
 Base = declarative_base()
 
 def get_secret_key():
-    key = os.getenv('PGCRYPTO_KEY')
+    key = os.getenv('FERNET_KEY')
     if not key:
         raise ValueError("Secret key not set in environment variables")
     return key
 
-# Utility functions for encryption and decryption
+
 def encrypt(expr):
     """Encrypt an expression (value) with a secret key."""
-    secret_key = os.getenv('PGCRYPTO_KEY')  # Ensure you've set this environment variable
-    return func.pgp_sym_encrypt(expr, secret_key)
+    fernet = Fernet(get_secret_key())
+    return fernet.encrypt(expr.encode()).decode()
 
-def decrypt(column):
+def decrypt(encrypted_data):
     """Decrypt a column with a secret key."""
-    secret_key = os.getenv('PGCRYPTO_KEY')
-    return func.pgp_sym_decrypt(column, secret_key).label(column.name)
-
+    fernet = Fernet(get_secret_key())
+    return fernet.decrypt(encrypted_data.encode()).decode()
 
 
 class User(db.Model):
-
-
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    wa_id = db.Column(db.Text, unique=True)  # Store WhatsApp ID directly without encryption
-    _serialized_credentials = db.Column('serialized_credentials', db.Text)  # Encrypted Google credentials
-    token_usage = db.Column('token_usage', db.Text)  # Encrypted token usage
+    wa_id = db.Column(db.Text, unique=True)
+    _serialized_credentials = db.Column('serialized_credentials', db.Text)
+    token_usage = db.Column('token_usage', db.Text)
 
     @hybrid_property
     def serialized_credentials(self):
         if self._serialized_credentials:
-            decrypted_data = decrypt(self._serialized_credentials)
-            return json.loads(decrypted_data)
+            try:
+                encrypted_data = self._serialized_credentials
+                decrypted_data = decrypt(encrypted_data)
+                return json.loads(decrypted_data)
+            except Exception as e:
+                logging.error(f"Error decrypting serialized credentials: {e}")
+                return None
         return None
 
     @serialized_credentials.setter
     def serialized_credentials(self, credentials):
-        self._serialized_credentials = encrypt(credentials.to_json())
+        serialized_json = credentials.to_json()  # Directly use json.dumps here
+        self._serialized_credentials = encrypt(serialized_json)
+
         
 
     # Relationship to Document
