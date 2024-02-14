@@ -119,20 +119,24 @@ def process_whatsapp_message(body):
             else:
                 # Get the most recent document
                 document_id = get_most_recent_document(wa_id)['document_id']
+                logging.info(f"Most recent document ID: {document_id}")
                 document_content = get_google_doc_content(credentials, document_id)
+                logging.info(f"Document content: {document_content}")
             
             message, categorization = generate_response(wa_id, body, document_content)
+            logging.info(f"Message: {message} Categorization: {categorization}")
             update_request = create_update_requests(document_content, categorization, message)
+            logging.info(f"Update request: {update_request}")
             batch_updated = batch_update_google_docs_document(credentials, document_id, update_request)
-            logging.info(batch_updated)
-            doc_link = f'https://docs.google.com/document/d/{document_id}/edit'
-            whatsapp_response = 'Message Added: ' + message + '\nCategory: ' + categorization + '\nAccess Doc: ' + doc_link
-            
-            # Generate a response text message
-            if batch_updated == {'status': 'success'}:
+            if 'replies' in batch_updated and len(batch_updated['replies']) > 0:
+                logging.info("Batch update successful.")
+                doc_link = f'https://docs.google.com/document/d/{document_id}/edit'
+                whatsapp_response = 'Message Added: ' + message + '\nCategory: ' + categorization + '\nAccess Doc: ' + doc_link
+                
+                # Generate a response text message
                 response = process_text_for_whatsapp(whatsapp_response)
             else:
-                response = process_text_for_whatsapp('An error occurred while updating the document. Please try again later.')
+                logging.error("Batch update failed.")
 
        
 

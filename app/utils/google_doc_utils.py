@@ -6,6 +6,7 @@ from googleapiclient.discovery import build
 from datetime import datetime
 from googleapiclient.errors import HttpError
 from google.auth.exceptions import GoogleAuthError
+from more_itertools import last
 
 # Create a new Google Docs document
 def create_google_docs_document(credentials):
@@ -192,6 +193,9 @@ def create_update_requests(doc_content, category, text):
             text_insert_request, text_style_request = insert_text_request(insertion_index, '\n' + text + '\n', 'NORMAL_TEXT')
         update_requests.extend([text_insert_request, text_style_request])
     else:
+        if last_content_is_newline(doc_content) == False:
+            newline_insert_request, newline_style_request = insert_text_request(insertion_index - 1, '\n', 'NORMAL_TEXT')
+            update_requests.extend([newline_insert_request, newline_style_request])
         # Category does not exist, create a new category at the end with HEADING_1 style
         category_string = '\n' + category + '\n' if existing_categories else category + '\n'
         category_length = len(category_string) + 1  # Include newline character

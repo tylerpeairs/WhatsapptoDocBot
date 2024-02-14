@@ -61,7 +61,7 @@ Category:
 '''
 
 # Function to generate a message and categorization from chat completions
-def generate_message_and_categorization(wa_id, message_and_categorization_input_content, max_attempts = 2):
+def generate_message_and_categorization(wa_id, message_and_categorization_input_content, max_attempts = 0):
     messages = [
         {
         "role": "system",
@@ -72,6 +72,7 @@ def generate_message_and_categorization(wa_id, message_and_categorization_input_
         "content": message_and_categorization_input_content
         }
     ]
+    logging.info(f"Messages: {messages}")
     attempts = 0
     token_count = 0
     while attempts <= max_attempts:
@@ -86,10 +87,14 @@ def generate_message_and_categorization(wa_id, message_and_categorization_input_
                 frequency_penalty=0,
                 presence_penalty=0
             )
+            logging.info(f"Response: {response}")
             validated_response = validate_and_parse_messaging_categorization(response)
-            token_count += response.usage.total_tokens
+            logging.info(f"Validated response: {validated_response}")
+            token_count += int(response.usage.total_tokens)
+            logging.info(f"Token count: {token_count}")
             if validated_response[0] == True:
-                update_token_usage(wa_id, token_count)
+                update_token_usage(wa_id, int(token_count))
+                logging.info(f"Token usage updated: {token_count}")
                 return validated_response[1], validated_response[2]
             else:
                 attempts += 1

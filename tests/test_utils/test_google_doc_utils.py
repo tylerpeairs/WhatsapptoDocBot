@@ -1,12 +1,9 @@
-from pyclbr import Class
 import unittest
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-import sys
 import difflib
 import json
 from datetime import datetime
-sys.path.append('/Users/tylerpeairs/SoftwareProjects/TestChatbot/python-whatsapp-bot/')
 from app.utils.google_doc_utils import create_update_requests, batch_update_google_docs_document, create_google_docs_document, parse_existing_categories, get_google_doc_content
 
 class TestUpdateRequestUtils(unittest.TestCase):
@@ -413,264 +410,264 @@ class TestUpdateRequestUtils(unittest.TestCase):
   
     def test_create_update_requests_existing_category_end_of_document_no_trailing_newline(self):
         doc_content = [
-      {
-        "endIndex": 1,
-        "sectionBreak": {
-          "sectionStyle": {
-            "columnSeparatorStyle": "NONE",
-            "contentDirection": "LEFT_TO_RIGHT",
-            "sectionType": "CONTINUOUS"
-          }
-        }
-      },
-      {
-        "startIndex": 1,
-        "endIndex": 24,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 1,
-              "endIndex": 24,
-              "textRun": {
-                "content": "Financial Transactions\n",
-                "textStyle": {}
+          {
+            "endIndex": 1,
+            "sectionBreak": {
+              "sectionStyle": {
+                "columnSeparatorStyle": "NONE",
+                "contentDirection": "LEFT_TO_RIGHT",
+                "sectionType": "CONTINUOUS"
               }
             }
-          ],
-          "paragraphStyle": {
-            "headingId": "h.j8f7cok0s5ox",
-            "namedStyleType": "HEADING_1",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 24,
-        "endIndex": 54,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 24,
-              "endIndex": 54,
-              "textRun": {
-                "content": "Please give Austin 300 pesos.\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 1,
+            "endIndex": 24,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 1,
+                  "endIndex": 24,
+                  "textRun": {
+                    "content": "Financial Transactions\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.j8f7cok0s5ox",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "namedStyleType": "NORMAL_TEXT",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 54,
-        "endIndex": 87,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 54,
-              "endIndex": 87,
-              "textRun": {
-                "content": "Please transfer 500 pesos to Ty.\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 24,
+            "endIndex": 54,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 24,
+                  "endIndex": 54,
+                  "textRun": {
+                    "content": "Please give Austin 300 pesos.\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "namedStyleType": "NORMAL_TEXT",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 87,
-        "endIndex": 88,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 87,
-              "endIndex": 88,
-              "textRun": {
-                "content": "\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 54,
+            "endIndex": 87,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 54,
+                  "endIndex": 87,
+                  "textRun": {
+                    "content": "Please transfer 500 pesos to Ty.\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "headingId": "h.ymjyujutzmie",
-            "namedStyleType": "HEADING_1",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 88,
-        "endIndex": 101,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 88,
-              "endIndex": 101,
-              "textRun": {
-                "content": "Social Plans\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 87,
+            "endIndex": 88,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 87,
+                  "endIndex": 88,
+                  "textRun": {
+                    "content": "\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.ymjyujutzmie",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "headingId": "h.ili04vc9w7k3",
-            "namedStyleType": "HEADING_1",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 101,
-        "endIndex": 145,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 101,
-              "endIndex": 145,
-              "textRun": {
-                "content": "Are we making any dinner plans for tonight?\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 88,
+            "endIndex": 101,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 88,
+                  "endIndex": 101,
+                  "textRun": {
+                    "content": "Social Plans\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.ili04vc9w7k3",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "namedStyleType": "NORMAL_TEXT",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 145,
-        "endIndex": 146,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 145,
-              "endIndex": 146,
-              "textRun": {
-                "content": "\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 101,
+            "endIndex": 145,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 101,
+                  "endIndex": 145,
+                  "textRun": {
+                    "content": "Are we making any dinner plans for tonight?\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "headingId": "h.x2a03jgebjrh",
-            "namedStyleType": "HEADING_1",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 146,
-        "endIndex": 165,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 146,
-              "endIndex": 165,
-              "textRun": {
-                "content": "Technology Inquiry\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 145,
+            "endIndex": 146,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 145,
+                  "endIndex": 146,
+                  "textRun": {
+                    "content": "\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.x2a03jgebjrh",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "headingId": "h.vwvivb1t3aps",
-            "namedStyleType": "HEADING_1",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 165,
-        "endIndex": 393,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 165,
-              "endIndex": 393,
-              "textRun": {
-                "content": "Just watched the videos, that's sick! So, is it live on your phone? Do you need to message or forward messages to a specific number, or if I text you, will it categorize and create a document for this conversation, for example?\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 146,
+            "endIndex": 165,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 146,
+                  "endIndex": 165,
+                  "textRun": {
+                    "content": "Technology Inquiry\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.vwvivb1t3aps",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "namedStyleType": "NORMAL_TEXT",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 393,
-        "endIndex": 394,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 393,
-              "endIndex": 394,
-              "textRun": {
-                "content": "\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 165,
+            "endIndex": 393,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 165,
+                  "endIndex": 393,
+                  "textRun": {
+                    "content": "Just watched the videos, that's sick! So, is it live on your phone? Do you need to message or forward messages to a specific number, or if I text you, will it categorize and create a document for this conversation, for example?\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "headingId": "h.4gm5caif0ni",
-            "namedStyleType": "HEADING_1",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 394,
-        "endIndex": 419,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 394,
-              "endIndex": 419,
-              "textRun": {
-                "content": "Real Estate Transactions\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 393,
+            "endIndex": 394,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 393,
+                  "endIndex": 394,
+                  "textRun": {
+                    "content": "\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.4gm5caif0ni",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "headingId": "h.pm0grojsaooo",
-            "namedStyleType": "HEADING_1",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      },
-      {
-        "startIndex": 419,
-        "endIndex": 453,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 419,
-              "endIndex": 453,
-              "textRun": {
-                "content": "Went to show the land to Alfredo.\n",
-                "textStyle": {}
+          },
+          {
+            "startIndex": 394,
+            "endIndex": 419,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 394,
+                  "endIndex": 419,
+                  "textRun": {
+                    "content": "Real Estate Transactions\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.pm0grojsaooo",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
               }
             }
-          ],
-          "paragraphStyle": {
-            "namedStyleType": "NORMAL_TEXT",
-            "direction": "LEFT_TO_RIGHT"
+          },
+          {
+            "startIndex": 419,
+            "endIndex": 453,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 419,
+                  "endIndex": 453,
+                  "textRun": {
+                    "content": "Went to show the land to Alfredo.\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
           }
-        }
-      }
-    ]
+        ]
         category = 'Real Estate Transactions'
         text = 'Need to parcel out some land.'
         
@@ -683,6 +680,83 @@ class TestUpdateRequestUtils(unittest.TestCase):
                     json.dumps(expected_output, indent=2).splitlines(),
                     json.dumps(output, indent=2).splitlines()
                  )))    
+    
+    def test_create_update_requests_new_category_end_of_document_no_trailing_newline(self):
+        doc_content = [{'endIndex': 1, 'sectionBreak': {'sectionStyle': {'columnSeparatorStyle': 'NONE', 'contentDirection': 'LEFT_TO_RIGHT', 'sectionType': 'CONTINUOUS'}}}, {'startIndex': 1, 'endIndex': 18, 'paragraph': {'elements': [{'startIndex': 1, 'endIndex': 18, 'textRun': {'content': 'Debt Obligations\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.1wx06ntcwsy', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 18, 'endIndex': 48, 'paragraph': {'elements': [{'startIndex': 18, 'endIndex': 48, 'textRun': {'content': 'Owe 6000 pesos to ClimaVista.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 48, 'endIndex': 92, 'paragraph': {'elements': [{'startIndex': 48, 'endIndex': 92, 'textRun': {'content': 'Owe an additional 8000 pesos to ClimaVista.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 92, 'endIndex': 138, 'paragraph': {'elements': [{'startIndex': 92, 'endIndex': 138, 'textRun': {'content': 'Owe an additional 10,000 pesos to ClimaVista.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 138, 'endIndex': 139, 'paragraph': {'elements': [{'startIndex': 138, 'endIndex': 139, 'textRun': {'content': '\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.m5qp55wcfbml', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 139, 'endIndex': 157, 'paragraph': {'elements': [{'startIndex': 139, 'endIndex': 157, 'textRun': {'content': 'Programming Tasks\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.s8mp9xazjbek', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 157, 'endIndex': 188, 'paragraph': {'elements': [{'startIndex': 157, 'endIndex': 188, 'textRun': {'content': 'I need to write some programs.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}]
+        category = 'Real Estate Inquiries'
+        text = 'Message Oscar regarding some real estate inquiries.'
+        
+        expected_output = {
+          "requests": [
+            {
+              "insertText": {
+                "location": {
+                  "index": 187
+                },
+                "text": "\n"
+              }
+            },
+            {
+              "updateParagraphStyle": {
+                "range": {
+                  "startIndex": 187,
+                  "endIndex": 188
+                },
+                "paragraphStyle": {
+                  "namedStyleType": "NORMAL_TEXT"
+                },
+                "fields": "namedStyleType"
+              }
+            },
+            {
+              "insertText": {
+                "location": {
+                  "index": 188
+                },
+                "text": "\nReal Estate Inquiries\n"
+              }
+            },
+            {
+              "updateParagraphStyle": {
+                "range": {
+                  "startIndex": 188,
+                  "endIndex": 211
+                },
+                "paragraphStyle": {
+                  "namedStyleType": "HEADING_1"
+                },
+                "fields": "namedStyleType"
+              }
+            },
+            {
+              "insertText": {
+                "location": {
+                  "index": 211
+                },
+                "text": "Message Oscar regarding some real estate inquiries.\n"
+              }
+            },
+            {
+              "updateParagraphStyle": {
+                "range": {
+                  "startIndex": 211,
+                  "endIndex": 263
+                },
+                "paragraphStyle": {
+                  "namedStyleType": "NORMAL_TEXT"
+                },
+                "fields": "namedStyleType"
+              }
+            }
+          ]
+        }
+        output = create_update_requests(doc_content, category, text)
+
+        self.assertEqual(output, expected_output, '\n' + '\n'.join(difflib.ndiff(
+                    json.dumps(expected_output, indent=2).splitlines(),
+                    json.dumps(output, indent=2).splitlines()
+                 )))    
+
 
 class TestCreateGoogleDocsDocument(unittest.TestCase):
     @patch('app.utils.google_doc_utils.build')  # Patch the 'build' function

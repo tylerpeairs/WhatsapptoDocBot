@@ -35,7 +35,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     wa_id = db.Column(db.Text, unique=True)
     _serialized_credentials = db.Column('serialized_credentials', db.Text)
-    token_usage = db.Column('token_usage', db.Text)
+    token_usage = db.Column('token_usage', db.Integer)
 
     @hybrid_property
     def serialized_credentials(self):

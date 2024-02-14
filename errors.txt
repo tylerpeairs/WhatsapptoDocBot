@@ -1,63 +1,109 @@
-Detected changes in /Users/tylerpeairs/SoftwareProjects/TestChatbot/python-whatsapp-bot/app/utils/whatsapp_utils.py, running tests...
-..2024-02-12 13:31:51,056 - root - ERROR - Request failed due to: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v18.0/246316221888389/messages
-Response status code: 200
-mock_get_most_recent_document called with: call('dummy_wa_id')
-mock_create_google_docs_document called with: call({'client_id': 'fake-client-id', 'client_secret': 'fake-client-secret', 'refresh_token': 'fake-refresh-token', 'token': 'fake-access-token', 'token_uri': 'https://oauth2.googleapis.com/token', 'scopes': ['https://www.googleapis.com/auth/documents', 'https://www.googleapis.com/auth/drive']})
-...2024-02-12 13:31:51,409 - root - ERROR - Google authentication error occurred: The credentials have expired or are invalid.
-Traceback (most recent call last):
-  File "/Users/tylerpeairs/SoftwareProjects/TestChatbot/python-whatsapp-bot/app/utils/google_oauth_utils.py", line 88, in get_credentials_from_session
-    raise GoogleAuthError("The credentials have expired or are invalid.")
-google.auth.exceptions.GoogleAuthError: The credentials have expired or are invalid.
-2024-02-12 13:31:51,789 - root - ERROR - Request failed due to: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v18.0/246316221888389/messages
-.response:  b'<!doctype html>\n<html lang=en>\n<title>400 Bad Request</title>\n<h1>Bad Request</h1>\n<p>The browser (or proxy) sent a request that this server could not understand.</p>\n'
-.2024-02-12 13:31:51,853 - root - INFO - Not a WhatsApp API event
-.2024-02-12 13:31:51,860 - root - INFO - Message is more than a minute old, not processing.
-.2024-02-12 13:31:51,866 - root - INFO - Received a WhatsApp status update.
-....2024-02-12 13:31:52,014 - root - INFO - Signature verification failed!
-........2024-02-12 13:31:52,227 - root - ERROR - An unexpected error occurred: test exception
-Traceback (most recent call last):
-  File "/Users/tylerpeairs/SoftwareProjects/TestChatbot/python-whatsapp-bot/app/utils/google_doc_utils.py", line 57, in get_google_doc_content
-    document = service.documents().get(documentId=document_id).execute()
-  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/unittest/mock.py", line 1081, in __call__
-    return self._mock_call(*args, **kwargs)
-  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/unittest/mock.py", line 1085, in _mock_call
-    return self._execute_mock_call(*args, **kwargs)
-  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/unittest/mock.py", line 1140, in _execute_mock_call
-    raise effect
-Exception: test exception
-...........2024-02-12 13:31:52,334 - root - INFO - Attempt: 0
-2024-02-12 13:31:52,334 - root - ERROR - Error: Simulated error
-2024-02-12 13:31:57,335 - root - INFO - Attempt: 1
-2024-02-12 13:31:57,336 - root - ERROR - Error: Simulated error
-2024-02-12 13:32:02,338 - root - INFO - Attempt: 2
-2024-02-12 13:32:02,339 - root - ERROR - Error: Simulated error
-.2024-02-12 13:32:07,346 - root - INFO - Attempt: 0
-2024-02-12 13:32:07,347 - root - INFO - Response: <MagicMock name='client.chat.completions.create()' id='4544836176'>
-2024-02-12 13:32:07,347 - root - INFO - Validated Response: (True, 'Categorized message', 'Some Category')
-2024-02-12 13:32:07,347 - root - INFO - Token Count: 50
-.2024-02-12 13:32:07,370 - root - INFO - <MagicMock name='batch_update_google_docs_document()' id='4545139280'>
-F.....2024-02-12 13:32:07,439 - root - ERROR - Request failed due to: 
-.2024-02-12 13:32:07,449 - root - INFO - Status: 200
-2024-02-12 13:32:07,452 - root - INFO - Content-type: <MagicMock name='post().headers.get()' id='4544851872'>
-.2024-02-12 13:32:07,458 - root - ERROR - Timeout occurred while sending message
-.
-======================================================================
-FAIL: test_process_whatsapp_message (tests.test_utils.test_whatsapp_utils.TestProcessWhatsAppMessage)
-----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/unittest/mock.py", line 1325, in patched
-    return func(*newargs, **newkeywargs)
-  File "/Users/tylerpeairs/SoftwareProjects/TestChatbot/python-whatsapp-bot/tests/test_utils/test_whatsapp_utils.py", line 275, in test_process_whatsapp_message
-    mock_process_text_for_whatsapp.assert_called_once_with(response)
-  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/unittest/mock.py", line 925, in assert_called_once_with
-    return self.assert_called_with(*args, **kwargs)
-  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/unittest/mock.py", line 913, in assert_called_with
-    raise AssertionError(_error_message()) from cause
-AssertionError: expected call not found.
-Expected: process_text_for_whatsapp('Message Added: Mock Message\nCategory: Mock Categorization\nAccess Doc: https://docs.google.com/document/d/mock_document_id/edit')
-Actual: process_text_for_whatsapp('An error occurred while updating the document. Please try again later.')
+  {
+    "requests": [
+      {
+        "insertText": {
+          "location": {
+-           "index": 187
+?                      ^
 
-----------------------------------------------------------------------
-Ran 43 tests in 17.209s
++           "index": 188
+?                      ^
 
-FAILED (failures=1)
+          },
+          "text": "\n"
+        }
+      },
+      {
+        "updateParagraphStyle": {
+          "range": {
+-           "startIndex": 187,
+?                           ^
+
++           "startIndex": 188,
+?                           ^
+
+-           "endIndex": 188
+?                         ^
+
++           "endIndex": 189
+?                         ^
+
+          },
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT"
+          },
+          "fields": "namedStyleType"
+        }
+      },
+      {
+        "insertText": {
+          "location": {
+-           "index": 188
+?                      ^
+
++           "index": 189
+?                      ^
+
+          },
+          "text": "\nReal Estate Inquiries\n"
+        }
+      },
+      {
+        "updateParagraphStyle": {
+          "range": {
+-           "startIndex": 188,
+?                           ^
+
++           "startIndex": 189,
+?                           ^
+
+-           "endIndex": 211
+?                         ^
+
++           "endIndex": 212
+?                         ^
+
+          },
+          "paragraphStyle": {
+            "namedStyleType": "HEADING_1"
+          },
+          "fields": "namedStyleType"
+        }
+      },
+      {
+        "insertText": {
+          "location": {
+-           "index": 211
+?                      ^
+
++           "index": 212
+?                      ^
+
+          },
+          "text": "Message Oscar regarding some real estate inquiries.\n"
+        }
+      },
+      {
+        "updateParagraphStyle": {
+          "range": {
+-           "startIndex": 211,
+?                           ^
+
++           "startIndex": 212,
+?                           ^
+
+-           "endIndex": 263
+?                         ^
+
++           "endIndex": 264
+?                         ^
+
+          },
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT"
+          },
+          "fields": "namedStyleType"
+        }
+      }
+    ]
+  }
