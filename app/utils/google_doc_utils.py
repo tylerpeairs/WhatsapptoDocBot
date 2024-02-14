@@ -2,6 +2,7 @@
 
 # Import the required modules
 import logging
+from turtle import update
 from googleapiclient.discovery import build
 from datetime import datetime
 from googleapiclient.errors import HttpError
@@ -112,7 +113,18 @@ def batch_update_google_docs_document(credentials, document_id, update_requests)
 def create_update_requests(doc_content, category, text):
     update_requests = []
 
-    def insert_text_request(location, content, style):
+    new_doc = doc_content[-1]['endIndex'] == 2
+
+    def insert_text_request(location, content, style, new_category=False):
+        # Calculate the basic end index
+        basic_end_index = location + len(content)
+    
+        # Adjust the end index if new_category is True
+        if new_doc == False:
+            end_index_adjusted = basic_end_index + 1 if new_category else basic_end_index
+        else:
+            end_index_adjusted = basic_end_index
+    
         return {
             'insertText': {
                 'location': {
@@ -124,7 +136,7 @@ def create_update_requests(doc_content, category, text):
             'updateParagraphStyle': {
                 'range': {
                     'startIndex': location,
-                    'endIndex': location + len(content)
+                    'endIndex': end_index_adjusted
                 },
                 'paragraphStyle': {
                     'namedStyleType': style,
@@ -176,7 +188,6 @@ def create_update_requests(doc_content, category, text):
         if 'paragraph' in last_content:
             last_paragraph_text = ''.join(element['textRun']['content'] for element in last_content['paragraph']['elements']).strip()
             last_content_is_newline = (last_paragraph_text == '')
-
         return last_content_is_newline
     
     # Parse for existing categories
@@ -197,14 +208,20 @@ def create_update_requests(doc_content, category, text):
             newline_insert_request, newline_style_request = insert_text_request(insertion_index - 1, '\n', 'NORMAL_TEXT')
             update_requests.extend([newline_insert_request, newline_style_request])
         # Category does not exist, create a new category at the end with HEADING_1 style
-        category_string = '\n' + category + '\n' if existing_categories else category + '\n'
+        if new_doc == False:
+            leading_newline_request, leading_newline_style_request = insert_text_request(insertion_index, '\n', 'NORMAL_TEXT')
+            insertion_index += 1
+            update_requests.extend([leading_newline_request, leading_newline_style_request])
+            
+
+
+        category_string = category + '\n'
         category_length = len(category_string) + 1  # Include newline character
-        category_insert_request, category_style_request = insert_text_request(insertion_index, category_string, 'HEADING_1')
+        category_insert_request, category_style_request = insert_text_request(insertion_index, category_string, 'HEADING_1', True)
        
         # and insert the text underneath it with NORMAL_TEXT style
         text_insert_index = insertion_index + category_length - 1
-        text_insert_request, text_style_request = insert_text_request(text_insert_index, text + '\n', 'NORMAL_TEXT')
-        
+        text_insert_request, text_style_request = insert_text_request(text_insert_index, text + '\n', 'NORMAL_TEXT', True)
         update_requests.extend([category_insert_request, category_style_request, text_insert_request, text_style_request])
 
     return {'requests': update_requests}

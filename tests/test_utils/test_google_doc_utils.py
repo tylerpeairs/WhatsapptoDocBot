@@ -178,127 +178,249 @@ class TestUpdateRequestUtils(unittest.TestCase):
                     json.dumps(output, indent=2).splitlines()
                  )))    
 
-    def test_create_update_requests_new_category(self):
+    def test_create_update_requests_new_category_trailing_newline(self):
         doc_content = [
-            {
-                "endIndex": 1,
-                "sectionBreak": {
-                "sectionStyle": {
-                    "columnSeparatorStyle": "NONE",
-                    "contentDirection": "LEFT_TO_RIGHT",
-                    "sectionType": "CONTINUOUS"
-                }
-                }
-            },
-            {
-                "startIndex": 1,
-                "endIndex": 14,
-                "paragraph": {
-                "elements": [
-                    {
-                    "startIndex": 1,
-                    "endIndex": 14,
-                    "textRun": {
-                        "content": "Old Category\n",
-                        "textStyle": {}
-                    }
-                    }
-                ],
-                "paragraphStyle": {
-                    "headingId": "h.iizz45crpqxq",
-                    "namedStyleType": "HEADING_1",
-                    "direction": "LEFT_TO_RIGHT"
-                }
-                }
-            },
-            {
-                "startIndex": 14,
-                "endIndex": 24,
-                "paragraph": {
-                "elements": [
-                    {
-                    "startIndex": 14,
-                    "endIndex": 24,
-                    "textRun": {
-                        "content": "Some text\n",
-                        "textStyle": {}
-                    }
-                    }
-                ],
-                "paragraphStyle": {
-                    "namedStyleType": "NORMAL_TEXT",
-                    "direction": "LEFT_TO_RIGHT"
-                }
-                }
-            },
-            {
-                "startIndex": 24,
-                "endIndex": 25,
-                "paragraph": {
-                "elements": [
-                    {
-                    "startIndex": 24,
-                    "endIndex": 25,
-                    "textRun": {
-                        "content": "\n",
-                        "textStyle": {}
-                    }
-                    }
-                ],
-                "paragraphStyle": {
-                    "namedStyleType": "NORMAL_TEXT",
-                    "direction": "LEFT_TO_RIGHT"
-                }
-                }
+          {
+            "endIndex": 1,
+            "sectionBreak": {
+              "sectionStyle": {
+                "columnSeparatorStyle": "NONE",
+                "contentDirection": "LEFT_TO_RIGHT",
+                "sectionType": "CONTINUOUS"
+              }
             }
+          },
+          {
+            "startIndex": 1,
+            "endIndex": 18,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 1,
+                  "endIndex": 18,
+                  "textRun": {
+                    "content": "Debt Obligations\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.1wx06ntcwsy",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
+          },
+          {
+            "startIndex": 18,
+            "endIndex": 48,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 18,
+                  "endIndex": 48,
+                  "textRun": {
+                    "content": "Owe 6000 pesos to ClimaVista.\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
+          },
+          {
+            "startIndex": 48,
+            "endIndex": 92,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 48,
+                  "endIndex": 92,
+                  "textRun": {
+                    "content": "Owe an additional 8000 pesos to ClimaVista.\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
+          },
+          {
+            "startIndex": 92,
+            "endIndex": 138,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 92,
+                  "endIndex": 138,
+                  "textRun": {
+                    "content": "Owe an additional 10,000 pesos to ClimaVista.\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
+          },
+          {
+            "startIndex": 138,
+            "endIndex": 139,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 138,
+                  "endIndex": 139,
+                  "textRun": {
+                    "content": "\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.m5qp55wcfbml",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
+          },
+          {
+            "startIndex": 139,
+            "endIndex": 157,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 139,
+                  "endIndex": 157,
+                  "textRun": {
+                    "content": "Programming Tasks\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "headingId": "h.s8mp9xazjbek",
+                "namedStyleType": "HEADING_1",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
+          },
+          {
+            "startIndex": 157,
+            "endIndex": 188,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 157,
+                  "endIndex": 188,
+                  "textRun": {
+                    "content": "I need to write some programs.\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
+          },
+          {
+            "startIndex": 188,
+            "endIndex": 189,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 188,
+                  "endIndex": 189,
+                  "textRun": {
+                    "content": "\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
+          }
         ]
 
-        category = 'New Category'
-        text = 'Some text'
+        category = 'Real Estate Inquiries'
+        text = 'Message Oscar regarding some real estate inquiries.'
 
         expected_output = {
-            "requests": [
-                {
-                "insertText": {
-                    "location": {
-                    "index": 24
-                    },
-                    "text": "\nNew Category\n"
-                }
+          "requests": [
+            {
+              "insertText": {
+                "location": {
+                  "index": 188
                 },
-                {
-                "updateParagraphStyle": {
-                    "range": {
-                    "startIndex": 24,
-                    "endIndex": 38
-                    },
-                    "paragraphStyle": {
-                    "namedStyleType": "HEADING_1"
-                    },
-                    "fields": "namedStyleType"
-                }
+                "text": "\n"
+              }
+            },
+            {
+              "updateParagraphStyle": {
+                "range": {
+                  "startIndex": 188,
+                  "endIndex": 189
                 },
-                {
-                "insertText": {
-                    "location": {
-                    "index": 38
-                    },
-                    "text": "Some text\n"
-                }
+                "paragraphStyle": {
+                  "namedStyleType": "NORMAL_TEXT"
                 },
-                {
-                "updateParagraphStyle": {
-                    "range": {
-                    "startIndex": 38,
-                    "endIndex": 48
-                    },
-                    "paragraphStyle": {
-                    "namedStyleType": "NORMAL_TEXT"
-                    },
-                    "fields": "namedStyleType"
-                }
-                }
-            ]
+                "fields": "namedStyleType"
+              }
+            },
+            {
+              "insertText": {
+                "location": {
+                  "index": 189
+                },
+                "text": "Real Estate Inquiries\n"
+              }
+            },
+            {
+              "updateParagraphStyle": {
+                "range": {
+                  "startIndex": 189,
+                  "endIndex": 212
+                },
+                "paragraphStyle": {
+                  "namedStyleType": "HEADING_1"
+                },
+                "fields": "namedStyleType"
+              }
+            },
+            {
+              "insertText": {
+                "location": {
+                  "index": 211
+                },
+                "text": "Message Oscar regarding some real estate inquiries.\n"
+              }
+            },
+            {
+              "updateParagraphStyle": {
+                "range": {
+                  "startIndex": 211,
+                  "endIndex": 264
+                },
+                "paragraphStyle": {
+                  "namedStyleType": "NORMAL_TEXT"
+                },
+                "fields": "namedStyleType"
+              }
+            }
+          ]
         }
         output = create_update_requests(doc_content, category, text)
         self.assertEqual(output, expected_output, '\n' + '\n'.join(difflib.ndiff(
@@ -681,7 +803,7 @@ class TestUpdateRequestUtils(unittest.TestCase):
                     json.dumps(output, indent=2).splitlines()
                  )))    
     
-    def test_create_update_requests_new_category_end_of_document_no_trailing_newline(self):
+    def test_create_update_requests_new_category_no_trailing_newline(self):
         doc_content = [{'endIndex': 1, 'sectionBreak': {'sectionStyle': {'columnSeparatorStyle': 'NONE', 'contentDirection': 'LEFT_TO_RIGHT', 'sectionType': 'CONTINUOUS'}}}, {'startIndex': 1, 'endIndex': 18, 'paragraph': {'elements': [{'startIndex': 1, 'endIndex': 18, 'textRun': {'content': 'Debt Obligations\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.1wx06ntcwsy', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 18, 'endIndex': 48, 'paragraph': {'elements': [{'startIndex': 18, 'endIndex': 48, 'textRun': {'content': 'Owe 6000 pesos to ClimaVista.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 48, 'endIndex': 92, 'paragraph': {'elements': [{'startIndex': 48, 'endIndex': 92, 'textRun': {'content': 'Owe an additional 8000 pesos to ClimaVista.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 92, 'endIndex': 138, 'paragraph': {'elements': [{'startIndex': 92, 'endIndex': 138, 'textRun': {'content': 'Owe an additional 10,000 pesos to ClimaVista.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 138, 'endIndex': 139, 'paragraph': {'elements': [{'startIndex': 138, 'endIndex': 139, 'textRun': {'content': '\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.m5qp55wcfbml', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 139, 'endIndex': 157, 'paragraph': {'elements': [{'startIndex': 139, 'endIndex': 157, 'textRun': {'content': 'Programming Tasks\n', 'textStyle': {}}}], 'paragraphStyle': {'headingId': 'h.s8mp9xazjbek', 'namedStyleType': 'HEADING_1', 'direction': 'LEFT_TO_RIGHT'}}}, {'startIndex': 157, 'endIndex': 188, 'paragraph': {'elements': [{'startIndex': 157, 'endIndex': 188, 'textRun': {'content': 'I need to write some programs.\n', 'textStyle': {}}}], 'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'direction': 'LEFT_TO_RIGHT'}}}]
         category = 'Real Estate Inquiries'
         text = 'Message Oscar regarding some real estate inquiries.'
@@ -713,14 +835,34 @@ class TestUpdateRequestUtils(unittest.TestCase):
                 "location": {
                   "index": 188
                 },
-                "text": "\nReal Estate Inquiries\n"
+                "text": "\n"
               }
             },
             {
               "updateParagraphStyle": {
                 "range": {
                   "startIndex": 188,
-                  "endIndex": 211
+                  "endIndex": 189
+                },
+                "paragraphStyle": {
+                  "namedStyleType": "NORMAL_TEXT"
+                },
+                "fields": "namedStyleType"
+              }
+            },
+            {
+              "insertText": {
+                "location": {
+                  "index": 189
+                },
+                "text": "Real Estate Inquiries\n"
+              }
+            },
+            {
+              "updateParagraphStyle": {
+                "range": {
+                  "startIndex": 189,
+                  "endIndex": 212
                 },
                 "paragraphStyle": {
                   "namedStyleType": "HEADING_1"
@@ -740,7 +882,7 @@ class TestUpdateRequestUtils(unittest.TestCase):
               "updateParagraphStyle": {
                 "range": {
                   "startIndex": 211,
-                  "endIndex": 263
+                  "endIndex": 264
                 },
                 "paragraphStyle": {
                   "namedStyleType": "NORMAL_TEXT"
@@ -750,6 +892,7 @@ class TestUpdateRequestUtils(unittest.TestCase):
             }
           ]
         }
+
         output = create_update_requests(doc_content, category, text)
 
         self.assertEqual(output, expected_output, '\n' + '\n'.join(difflib.ndiff(
