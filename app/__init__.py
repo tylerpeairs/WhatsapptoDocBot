@@ -2,6 +2,7 @@
 
 #Import OS and Dotenv
 import os
+import dotenv
 
 #Import app configurations and logging settings
 from .config import load_configurations, configure_logging
@@ -10,26 +11,38 @@ from .config import load_configurations, configure_logging
 from .extensions import db
 
 #Import Flask and the database
-from flask import Flask, redirect, request, session, url_for, json, render_template
+from flask import Flask, redirect, request, session, url_for, json, render_template, jsonify
 
+from werkzeug.exceptions import BadRequest
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #TODO bypass https requirement (REMOVE FOR PROD)
+dotenv.load_dotenv()
+
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #TODO bypass https requirement (REMOVE FOR PROD)    
 
 # Create the app
-def create_app():
-
+def create_app(config_class=None):
     
     # Create a Flask app
     app = Flask(__name__)
-    app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Set a consistent secret key
-    app.config['SECRET_KEY'] = 'a_secret_key'
+    app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Set a consistent secret key for session management
+
+    if config_class:
+        app.config.from_object(config_class)  # Apply the configuration from the class
+
+
+    @app.errorhandler(BadRequest)
+    def handle_bad_request(e):
+        if request.content_type == 'application/json':
+            # This assumes the BadRequest was due to JSON parsing
+            return jsonify({"status": "error", "message": "Invalid JSON provided"}), 400
+        return e.get_response()
 
     
     # Load configurations and logging settings
     load_configurations(app)
     configure_logging()
 
-    # Set up the database
+    # Set up the database  
     db.init_app(app)
 
     # Import models here to ensure they are known to SQLAlchemy
@@ -44,8 +57,8 @@ def create_app():
 # Import blueprints to register
 def register_blueprints(app):
     # Import blueprints
-    from .flask_blueprints.webhook_blueprint import webhook_blueprint
-    from .flask_blueprints.oauth_blueprint import oauth_blueprint
+    from .blueprints.webhook_blueprint import webhook_blueprint
+    from .blueprints.oauth_blueprint import oauth_blueprint
 
     # Register blueprints
     app.register_blueprint(webhook_blueprint)

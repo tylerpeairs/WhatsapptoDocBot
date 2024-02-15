@@ -1,0 +1,109 @@
+  {
+    "requests": [
+      {
+        "insertText": {
+          "location": {
+-           "index": 187
+?                      ^
+
++           "index": 188
+?                      ^
+
+          },
+          "text": "\n"
+        }
+      },
+      {
+        "updateParagraphStyle": {
+          "range": {
+-           "startIndex": 187,
+?                           ^
+
++           "startIndex": 188,
+?                           ^
+
+-           "endIndex": 188
+?                         ^
+
++           "endIndex": 189
+?                         ^
+
+          },
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT"
+          },
+          "fields": "namedStyleType"
+        }
+      },
+      {
+        "insertText": {
+          "location": {
+-           "index": 188
+?                      ^
+
++           "index": 189
+?                      ^
+
+          },
+          "text": "\nReal Estate Inquiries\n"
+        }
+      },
+      {
+        "updateParagraphStyle": {
+          "range": {
+-           "startIndex": 188,
+?                           ^
+
++           "startIndex": 189,
+?                           ^
+
+-           "endIndex": 211
+?                         ^
+
++           "endIndex": 212
+?                         ^
+
+          },
+          "paragraphStyle": {
+            "namedStyleType": "HEADING_1"
+          },
+          "fields": "namedStyleType"
+        }
+      },
+      {
+        "insertText": {
+          "location": {
+-           "index": 211
+?                      ^
+
++           "index": 212
+?                      ^
+
+          },
+          "text": "Message Oscar regarding some real estate inquiries.\n"
+        }
+      },
+      {
+        "updateParagraphStyle": {
+          "range": {
+-           "startIndex": 211,
+?                           ^
+
++           "startIndex": 212,
+?                           ^
+
+-           "endIndex": 263
+?                         ^
+
++           "endIndex": 264
+?                         ^
+
+          },
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT"
+          },
+          "fields": "namedStyleType"
+        }
+      }
+    ]
+  }

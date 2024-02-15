@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Index</title>
+</head>
+<body>
+    <h1>Test Index Page</h1>
+    <div id="test-container">
+        <!-- Test case 1: Verify message is displayed -->
+        <div id="test-case-1">
+            <p id="message">This is a test message</p>
+            <button id="close-button">Close Tab</button>
+        </div>
+
+        <!-- Test case 2: Verify message is not displayed -->
+        <div id="test-case-2">
+            <button id="close-button">Close Tab</button>
+        </div>
+    </div>
+
+    <script>
+        // Test case 1: Verify message is displayed
+        const testCase1 = document.getElementById('test-case-1');
+        const message1 = testCase1.querySelector('#message');
+        const closeButton1 = testCase1.querySelector('#close-button');
+
+        if (message1.textContent === 'This is a test message') {
+            console.log('Test case 1 passed');
+        } else {
+            console.error('Test case 1 failed');
+        }
+
+        // Test case 2: Verify message is not displayed
+        const testCase2 = document.getElementById('test-case-2');
+        const message2 = testCase2.querySelector('#message');
+        const closeButton2 = testCase2.querySelector('#close-button');
+
+        if (!message2) {
+            console.log('Test case 2 passed');
+        } else {
+            console.error('Test case 2 failed');
+        }
+    </script>
+</body>
+</html>

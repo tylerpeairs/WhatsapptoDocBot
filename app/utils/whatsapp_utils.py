@@ -1,37 +1,24 @@
 # Description: Utility functions for WhatsApp integration
 
 # Import the required libraries
-from functools import update_wrapper
 import logging
-from flask import current_app, jsonify, session 
+from flask import current_app, jsonify 
 import json
 import requests
 import re
 import datetime
-import time
 
 # Import the database
-from ..models import User, Document
 from ..database import get_user_credentials, store_document_details, get_most_recent_document
-from .google_doc_utils import create_google_docs_document, get_google_doc, batch_update_google_docs_document
-from google.oauth2.credentials import Credentials
-from .openai_assistant_utils import generate_response
+from .google_doc_utils import create_google_docs_document, get_google_doc_content, batch_update_google_docs_document, create_update_requests
+from app.utils.openai.openai_call_utils import generate_response
 
-processed_messages = set()  # This will keep track of processed message IDs
-
-# Update Whatsapp Utils for any credentials related references
-# Update Prompt to pass in credentials object instead
-
-
-# Import the OpenAI service
-#from app.services.openai_service import generate_response
 
 
 # Log the HTTP response
 def log_http_response(response):
     logging.info(f"Status: {response.status_code}")
     logging.info(f"Content-type: {response.headers.get('content-type')}")
-    logging.info(f"Body: {response.text}")
 
 # Get the input for a text message
 def get_text_message_input(recipient, text):
@@ -64,12 +51,12 @@ def send_message(data):
         response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
     except requests.Timeout:
         logging.error("Timeout occurred while sending message")
-        return jsonify({"status": "error", "message": "Request timed out"}), 408
+        return jsonify({"status": "error", "message": "Service temporarily unavailable"}), 408
     except (
         requests.RequestException
     ) as e:  # This will catch any general request exception
         logging.error(f"Request failed due to: {e}")
-        return jsonify({"status": "error", "message": "Failed to send message"}), 500
+        return jsonify({"status": "error", "message": "Service temporarily unavailable"}), 500
     else:
         # Process the response as normal
         log_http_response(response)
@@ -77,6 +64,9 @@ def send_message(data):
 
 # Process the incoming WhatsApp message
 def process_text_for_whatsapp(text):
+
+    if not isinstance(text, str):
+        raise ValueError("The input text must be a string")
     # Remove brackets
     pattern = r"\【.*?\】"
     # Substitute the pattern with an empty string
@@ -95,28 +85,26 @@ def process_text_for_whatsapp(text):
 
 # Process the incoming WhatsApp message
 def process_whatsapp_message(body):
-    logging.info(f"Received WhatsApp message body: {body}")
 
     # Check timestamp to confirm it's a recent message
     time_difference_in_minutes = process_message_timestamp(body)
     # Check if the message was sent within the last minute
     if time_difference_in_minutes > 1:
         # If the message is older than 1 minutes, do not process it
-        print("Message is more than a minute old, not processing.") 
+        logging.info("Message is more than a minute old, not processing.") 
         return
     else:
         # Extract the user's WhatsApp ID and name
         wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
-
-
         # Check if User Exists and Get Their Credentials
         credentials = get_user_credentials(wa_id)
 
 
         # If user credentials do not exist, prompt the user to login
         if not credentials:
-            login_url = f"https://deciding-werewolf-infinitely.ngrok-free.app/login?number={wa_id}"
-            response = f"For me to create and update Google Docs, I will need you to authorize me to access your Google Docs. Please do this at {login_url}" #TODO: Update URL and make it clickable
+            # Use a configuration variable for the domain
+            login_url = f"{current_app.config['APP_DOMAIN']}/login?number={wa_id}"
+            response = f"For me to create and update Google Docs, I will need authorization. Please do this at {login_url}"
         # If
         else:
             # Check if the user has a document
@@ -125,32 +113,35 @@ def process_whatsapp_message(body):
                 document_details = create_google_docs_document(credentials)
                 document_title = document_details['title']
                 document_id = document_details['document_id']
+                document_content = get_google_doc_content(credentials, document_id)
                 # Store the document details in the database
                 store_document_details(wa_id, document_title, document_id)
-                document_content = get_google_doc(credentials, document_id)
             else:
                 # Get the most recent document
-                document = get_most_recent_document(wa_id)
-                document_id = document['document_id']
-                document_content = get_google_doc(credentials, document_id)
-                logging.info(f"Document Content: {document_content}")
-                response = generate_response(body, wa_id, document_content, credentials)
-                #update_request = create_append_text_update_request(document_content, text_body)
-                #batch_update_google_docs_document(credentials, document_id, update_request)
-                
+                document_id = get_most_recent_document(wa_id)['document_id']
+                logging.info(f"Most recent document ID: {document_id}")
+                document_content = get_google_doc_content(credentials, document_id)
+                logging.info(f"Document content: {document_content}")
+            
+            message, categorization = generate_response(wa_id, body, document_content)
+            logging.info(f"Message: {message} Categorization: {categorization}")
+            update_request = create_update_requests(document_content, categorization, message)
+            logging.info(f"Update request: {update_request}")
+            batch_updated = batch_update_google_docs_document(credentials, document_id, update_request)
+            if 'replies' in batch_updated and len(batch_updated['replies']) > 0:
+                logging.info("Batch update successful.")
+                doc_link = f'https://docs.google.com/document/d/{document_id}/edit'
+                whatsapp_response = 'Message Added: ' + message + '\nCategory: ' + categorization + '\nAccess Doc: ' + doc_link
 
-    
+            else:
+                logging.error("Batch update failed.")
+                whatsapp_response = "An error occurred while updating the document. Please try again later."
 
-        name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
-        # Extract the message & message type
-        message = body["entry"][0]["changes"][0]["value"]["messages"][0]
-        message_body = message["text"]["body"]
-
-        # Generate a response text message
-        response = process_text_for_whatsapp(response)
+    # Generate a response text message
+    response = process_text_for_whatsapp(whatsapp_response)
 
     # Prepare Whatsapp JSON and send the message
-    data = get_text_message_input(current_app.config["RECIPIENT_WAID"], response)
+    data = get_text_message_input(wa_id, response)
     send_message(data)
 
 # Check if the incoming payload is a valid WhatsApp message

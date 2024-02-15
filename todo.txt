@@ -1,60 +1,22 @@
-2. Consider additional prompt engineering: many-shot approach, retrieval/fine-tuning, conversations v single message inputs
-Why is a message being added to an existing thread?
-3. Collect token counts per user, collect document_contents, and update_requests in order to fine-tune/embed
-4. You can probably prompt engineer test directly within the assistant_starter now that credentials are gone
-5. What do you consider production requirements? 
+10. collect last 10 messages from user (embed for application security - can you fine-tune with embeddings)?
 
-
-create a github branch
-let's do a completion api function call attempt instead!
-leverage prompt-chaining too
-with 10 examples you can fine-tine a model, can you also change the function output to be more specific?
-
-
-You could probbaly pass just document content to save on tokens; in most cases you don't need to push messages to a thread and can save on tokens
-
-
-6. Look into application security
-7. Unit tests
-8. Try/Catch
-9. Production
-10. Other TODO's
-11. Can you track token usage by user instead of making new OpenAI API key for each user? then charge based off token_usage
-you could create a basic tier of 100 messages per month based off expected token usage on 100 messages
-
-get recipient whatsapp id from webhook instead of storing it as env variable, at this point see if you can do the opt-in by contacting the bot
-
-
-1. Start with create document assistant single thread
-2. Initiate a create document with a whatsapp message
-3. Store document id & title in the database to reference and do a creation check during process message
-4. 2nd message after auth should be a document link
-5. initiate a get doc function in assistant by passing in document id then console log it
-6. initiate a batch update function in assistant by passing in doc id and whatsapp message, telling it in the prompt to update headers, move to many shot
-
-
-
-https://cookbook.openai.com/examples/assistants_api_overview_python
-You really only need the update request from the chatbot since document id is in document_content and credentials are available via wa_id
-
-#Create and test new assistant with updated instructions and functions
-
-
-salesforce & notion & airtable connections
-
+========================================================================
+Prompt Engineering:
+force json response and try 3.5 turbo
+Continue to prompt engineer for 10 edge cases.
+last 10 examples as 10-hot
+User feedback
+User added categorization
+Delete
+Can use text generation for list of categories then add that to a zero-shot classifier
+========================================================================
+Nice to have:
+Document Creation query for name
+Tests for longer text strings
 Add speach-to-text processing
+salesforce & notion & airtable connections
+assistant model with message threads for categorization recommendations
+========================================================================
 
 
-Production Ready
-1. Can handle 10 edge cases from prompting in the same thread
-2. Can handle multiple run instances without receiving an error
-3. Can track usage by user
-4. Application security
-5. 
-
-
-1. Learn prompt engineering best practies
-2. Generate your best prompt attempt
-3. Find resources to make iterations of the prompt for testing
-4. Come up with 10 test cases for the prompt
-5. Use resources to test the prompt against different models w/ various temperatues
+Push to Production
