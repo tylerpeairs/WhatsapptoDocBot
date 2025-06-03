@@ -1,6 +1,6 @@
- # WhatsApp to Doc Bot
+ # WhatsApp-to-Docs-AI
 
- WhatsApp to Doc Bot is a Flask-based application that integrates with the WhatsApp Business Cloud API, OpenAI, and Google Docs to convert WhatsApp messages into clear, categorized entries in a Google Document. Incoming messages are processed via a webhook, rewritten and categorized by an AI model, and appended under the appropriate heading in a Google Doc in the user's Drive.
+WhatsApp-to-Docs-AI is a Flask-based application that integrates with the WhatsApp Business Cloud API, OpenAI, and Google Docs to convert WhatsApp messages into clear, categorized entries in a Google Document. Incoming messages are processed via a webhook, rewritten and categorized by an AI model, and appended under the appropriate heading in a Google Doc in the user's Drive.
 
  ## Features
  - **Real-time Webhook Processing**: Receives WhatsApp messages via webhook and filters out status updates.
